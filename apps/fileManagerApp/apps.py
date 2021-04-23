@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class FilemanagerappConfig(AppConfig):
-    name = 'fileManagerApp'
+    name = 'apps.fileManagerApp'

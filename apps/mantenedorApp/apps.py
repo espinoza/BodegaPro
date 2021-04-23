@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class MantenedorappConfig(AppConfig):
-    name = 'mantenedorApp'
+    name = 'apps.mantenedorApp'

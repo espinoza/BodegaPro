@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class LoginAppConfig(AppConfig):
-    name = 'loginApp'
+    name = 'apps.loginApp'
