@@ -33,6 +33,14 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'apps.master',
+    'apps.loginApp',
+    'apps.mantenedorApp',
+    'apps.productoApp',
+    'apps.bodegaproAdminApp',
+    'apps.movApp',
+    'apps.fileManagerApp',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -56,7 +64,7 @@ ROOT_URLCONF = 'BodegaPro.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates'),],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -78,7 +86,7 @@ WSGI_APPLICATION = 'BodegaPro.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'bodegapro',
+        'NAME': 'bodegapro_db',
         'USER' : 'postgres',
         'PASSWORD' : 'root',
         'HOST' : '127.0.0.1',
@@ -129,3 +137,12 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# MultiApp
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
+
+# Files (upload)
+MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+MEDIA_URL = '/media/'

@@ -1,0 +1,29 @@
+<!--MODAL-->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalLabel">...</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="" id="form-modal" method="POST">
+        {% csrf_token %}
+        <div class="modal-body row">
+            <div class="mb-3 col-sm-3">
+                <label for="modal-pos" class="col-form-label">Posición</label>
+                <input type="text" class="form-control" id="modal-pos" name="modal_pos">
+            </div>
+            <div class="mb-3 col-sm-9">
+                <label for="modal-name" class="col-form-label">Descripción</label>
+                <input type="text" class="form-control" id="modal-name" name="modal_name">
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="modal-edit-btn">Guardar</button>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+<!--FIN MODAL-->

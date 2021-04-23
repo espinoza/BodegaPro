@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extraStyles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/stylesMantenedor.css' %}"/> 
+{% endblock %}
+
+{% block title %}Editar Usuario{% endblock %}
+
+{% block extraScripts %}
+<script src="{% static 'js/functionsEditUser.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+{% if user.isAdmin and not user_edit.isAdmin %}
+<div class="row">
+    <h3 class="col-9">{{ user_edit.full_name }} ({{ user_edit.more_info.alias }})</h3>
+    <a class="btn btn-success col-3 h-red mg-auto" href="{#% url 'permisosuser' id_user=user_edit.id %#}">Editar Permisos...</a>
+</div>
+{% else %}
+<h3 class="col-9">{{ user_edit.full_name }} ({{ user_edit.more_info.alias }})</h3>
+{% endif %}
+
+{% if messages %}
+<ul class="messages">    
+    {% for message in messages %}    
+        <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>    
+    {% endfor %}
+</ul>
+{% endif %}
+
+<br>
+
+<!--PERMISOS-->
+<!--
+{% if not user_edit.isAdmin %}
+<div style="margin-top: -20px;">
+{% if user_edit.puedeRendir %}
+<p style="color: #198754; font-weight:600; margin-bottom: 5px;">Rinde en:
+{% for area in user_edit.areas_que_rinde.all %}
+<span class="badge rounded-pill bg-success">{{ area.name }}</span>
+{% endfor %}
+</p>
+{% endif %}
+
+{% if user_edit.puedeAutorizar %}
+<p style="color: #ffc107; font-weight:600; margin-bottom: 5px;">Autoriza en:
+{% for area in user_edit.areas_que_autoriza.all %}
+<span class="badge rounded-pill bg-warning">{{ area.name }}</span>
+{% endfor %}
+</p>
+{% endif %}
+
+{% if user_edit.puedePagar %}
+<p style="color: #dc3545; font-weight:600;">Paga en:
+{% for area in user_edit.areas_que_paga.all %}
+<span class="badge rounded-pill bg-danger">{{ area.name }}</span>
+{% endfor %}
+</p>
+{% endif %}
+
+</div>
+{% endif %}
+-->
+
+<!--FORMS-->
+<div class="row">
+    <form class="col-md-6 bordered mg-bot-30" action="{% url 'update_data' %}" id="form_datagral" method="POST">
+        {% csrf_token %}
+
+        <h4>Editar Información General</h4>
+
+        <div class="row">
+            <div class="col form-floating mb-3">
+                <input type="text" class="form-control" id="name1" name="name1" placeholder="Su nombre" 
+                    value="{{ user_edit.name1 }}" onblur="chkErrores('name1')" onfocus="eraseError('name1')">
+                <label class="mgl08rem" for="name1">Nombre</label>
+            </div>
+            <!--div class="col-md-6 form-floating mb-3">
+                <input type="text" class="form-control" id="name2" name="name2" placeholder="Su segundo nombre" 
+                    value="{{ user_edit.name2 }}" onblur="chkErrores('name2')" onfocus="eraseError('name2')">
+                <label class="mgl08rem" for="name2">Nombre 2</label>
+            </div-->
+        </div>
+        <div class="row">
+            <div class="col form-floating mb-3">
+                <input type="text" class="form-control" id="last_name1" name="last_name1" placeholder="Su apellido" 
+                    value="{{ user_edit.last_name1 }}" onblur="chkErrores('last_name1')" onfocus="eraseError('last_name1')">
+                <label class="mgl08rem" for="last_name1">Apellido</label>
+            </div>
+            <!--div class="col-md-6 form-floating mb-3">
+                <input type="text" class="form-control" id="last_name2" name="last_name2" placeholder="Su segundo apellido" 
+                    value="{{ user_edit.last_name2 }}" onblur="chkErrores('last_name2')" onfocus="eraseError('last_name2')">
+                <label class="mgl08rem" for="last_name2">Apellido 2</label>
+            </div-->
+        </div>
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="email" name="email" placeholder="su@email.porfavor" 
+                value="{{ user_edit.email }}">
+            <label for="email">Email</label>
+        </div>
+
+        <div class="row mgt-1">
+            <div class="col-10">
+                <button id="btn-submit-datagral" class="btn btn-success">Actualizar Info General</button>
+            </div>
+        </div>
+
+        <input type="hidden" name="id" value="{{ user_edit.id }}">
+        <input type="hidden" name="tipo" value="datagral">
+
+    </form>
+
+    <form class="col-md-5 bordered mg-bot-30 mgl-20" action="{% url 'update_data' %}" id="form_pass" method="POST">
+        {% csrf_token %}
+
+        <h4>Cambio de Contraseña</h4>
+        <div class="form-floating mb-3">
+            <input type="password" class="form-control" id="password" name="password" placeholder="Nueva Contraseña" 
+                onblur="chkErrores('password')" onfocus="eraseError('password')">
+            <label for="password">Nueva Contraseña</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirme la Nueva Contraseña" 
+                onblur="chkErrores('confirm_password')" onfocus="eraseError('confirm_password')">
+            <label for="confirm_password">Confirmar Nueva Contraseña</label>
+        </div>
+
+
+        <div class="row mgt-1">
+            <div class="col-10">
+                <button id="btn-submit-pass" class="btn btn-success">Cambiar Contraseña</button>
+            </div>
+        </div>
+
+        <input type="hidden" name="id" value="{{ user_edit.id }}">
+        <input type="hidden" name="tipo" value="pass">
+
+    </form>
+
+</div>
+
+<div class="row">
+
+    {% if user.isAdmin %}
+
+    <form class="col-md-5 bordered mg-bot-30 mgl-20" action="{% url 'update_data' %}" id="form_admin" method="POST">
+        {% csrf_token %}
+
+        <h4>Configuración Datos Adicionales</h4>
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="alias" name="alias" placeholder="Alias Usuario" 
+                onblur="chkErrores('alias')" onfocus="eraseError('alias')" value="{{ user_edit.more_info.alias }}">
+            <label for="password">Alias Usuario</label>
+        </div>
+        <div class="col-md-8 form-floating mb-3">
+            <select class="form-select iblock-vatop" name="area" id="area">
+                {% if not user_edit.more_info.area_id %}
+                <option value="0" selected disabled>ELEGIR Area...</option>
+                {% endif %}
+                {% for area in areas %}
+                <option value="{{ area.id }}" 
+                {% if user_edit.more_info.area_id and user_edit.more_info.area_id == area.id %}selected{% endif %}>{{ area.name }}</option>
+                {% endfor %}
+            </select>
+            <label for="area">Area</label>
+        </div>
+        <div class="row">
+            <div class="col-md-5 form-floating mb-3">
+                <select class="form-select" name="is_admin" id="is_admin" required>
+                    {% if request.session.id != user_edit.id %}
+                    <option value="false" {% if not user_edit.isAdmin %}selected{% endif %} >Normal</option>
+                    {% endif %}
+                    <option value="true" {% if user_edit.isAdmin %}selected{% endif %} >Admin</option>
+                </select>
+                <label for="is_admin" class="mgl08rem">Tipo Usuario</label>
+            </div>
+        </div>
+
+        <div class="row mgt-1">
+            <div class="col-10">
+                <button id="btn-submit-admin" class="btn btn-success">Actualizar Configuración</button>
+            </div>
+        </div>
+
+        <input type="hidden" name="id" value="{{ user_edit.id }}">
+        <input type="hidden" name="tipo" value="admin">
+
+    </form>
+
+    {% endif %}
+
+
+</div>
+
+{% endblock %}

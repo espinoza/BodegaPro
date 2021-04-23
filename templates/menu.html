@@ -1,0 +1,44 @@
+{% if request.session.id %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" id="marca" href="{% url 'index' %}">BODEGA Pro</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav">
+          {% if user.puedeSolicitar or user.isAdmin %}
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{% url 'dashboard' id_user=request.session.id tipo='activemov' %}">Mis Movimientos</a>
+          </li>
+          {% endif %}
+          {% if user.puedeAutorizar or user.puedeEjecutar or user.isAdmin %}
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{% url 'dashboard' id_user='0' tipo='activemov' %}">Movimientos de Usuarios</a>
+          </li>
+          {% endif %}
+          <li class="nav-item">
+            <a class="nav-link" href="#">Reportes...</a>
+          </li>
+        </ul>
+        <div class="nav-item dropdown mg-auto">
+            <span class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              {{ request.session.name }}
+            </span>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+              <li><a class="dropdown-item" href="{% url 'edituser' id_user=request.session.id  %}">Mis Datos</a></li>
+              {% if user.isAdmin or user.puedeAutorizar or user.puedeEjecutar %}
+              <li><a class="dropdown-item" href="{% url 'usuarios' %}">Usuarios</a></li>
+              {% endif %}
+              {% if user.isAdmin %}
+              <li><a class="dropdown-item" href="{% url 'mantenedor' tabla_name='area' %}">Mantenedor</a></li>
+              {% endif %}
+              <li><a class="dropdown-item" href="{% url 'signout' %}">Cerrar Sesión</a></li>
+            </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+  {% else %}
+  <!--Nada que mostrar en menubar-->
+  {% endif %}

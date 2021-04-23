@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+ 
+{% block extraStyles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/stylesMantenedor.css' %}"/> 
+{% endblock %}
+
+{% block title %}Mantenedor{% endblock %}
+
+{% block extraScripts %}
+<script src="{% static 'js/functionsMantenedor.js' %}"></script>
+{% endblock %}
+
+{% block modales %}
+{% include "modal.html" %}
+{% endblock %}
+
+{% block content %}
+<h3>Mantenedor</h3>
+
+<div class='row'>
+    <div class="col-md-6">
+        <form action="" id="form-table-name" method="POST">
+            {% csrf_token %}
+            <select class="form-select iblock-vatop" name="tabla_name" style="width : 65%;" id="select-tabla">
+                {% for value, dato in tablas.items %}
+                <option value="{{ value }}" {% if tabla_name == value %}selected{% endif %}>{{ dato }}</option>
+                {% endfor %}
+            </select>
+            <button class="btn btn-outline-secondary iblock-vatop" id="btn-tabla">ACTUALIZAR</button>
+        </form>
+    </div>
+</div>
+
+<table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Posición</th>
+        <th scope="col">Contenido</th>
+        <th scope="col">ST</th>
+        <th scope="col">Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="table-add-item">
+        <form action="" id="form-add-item" method="POST">
+            {% csrf_token %}
+            <tr id="tr-0" class="man-resaltado">
+                <td><input type="number" min="0" max="30000" name="pos" id="add-pos" placeholder="Pos..."></td>
+                <td colspan="2"><input type="text" name="name" id="add-name" placeholder="Descripción..."></td>
+                <td scope="col">
+                <button class="btn btn-success" id="btn-add-item">Agregar Item</button>
+                </td>
+            </tr>
+        </form>
+    </tbody>
+    <tbody id="table-body">
+        <!--dynamic content here-->
+    </tbody>
+  </table>
+  <input type="hidden" value="" id="id-to-edit">
+
+
+<script>
+    cargarTablaActiva()
+</script>
+
+{% endblock %}

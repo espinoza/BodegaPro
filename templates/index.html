@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block menuBar %}
+{% endblock %}
+
+{% block content %}
+    <div id="welcome" class="bodypadding3">
+        <h1>Bienvenido a <span id="span-titulo">BODEGA Pro</span></h1>
+        <h5 id="intro-subtitulo" class="mg-bot-30">Todas las herramientas para gestionar movimientos de entrada y salida de 
+            productos de bodega que abastezcan a diferentes áreas de su empresa, donde los usuarios tienen permisos para solicitar, 
+            autorizar, ejecutar movimientos para las áreas en las que están designados.</h3>
+        <button class="btn btn-success btn-lg mg-bot-30" onClick="parent.location='{% url 'signin' %}'">Iniciar</button>
+    </div>
+    <script>
+        var root = document.documentElement;
+        root.className += 'bg-grad';
+    </script>
+{% endblock %}

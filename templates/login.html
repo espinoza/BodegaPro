@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login{% endblock %}
+
+{% block menuBar %}
+{% endblock %}
+
+{% block content %}
+<div class="bg-grad bodywidth70 bodypadding10">
+
+    <h3>Bodega Pro - Login</h3>
+
+    {% if messages %}
+    <ul class="messages">    
+        {% for message in messages %}    
+            <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>    
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <form action="" id="formulario" method="POST">
+        {% csrf_token %}
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="email" name="email" placeholder="Email" 
+                value="{{ email }}">
+            <label for="email">Email</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="password" class="form-control" id="password" name="password" 
+            placeholder="Contraseña" value="{{ password }}"> 
+            <label for="network">Contraseña</label>
+        </div>
+        <div class="row mgt-1">
+            <div class="col-10">
+                <button id="btn-submit" class="btn btn-primary">Ingresar</button>
+            </div>
+        </div>
+
+    </form>
+
+    <a href="{% url 'register' %}">No tiene cuenta? Regístrese.</a>
+
+</div>
+
+{% endblock %}
