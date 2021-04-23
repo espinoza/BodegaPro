@@ -1,0 +1,23 @@
+#table-body tr:hover{
+    background-color: rgb(227, 233, 227);
+}
+
+.man-resaltado{
+    background-color: rgb(227, 233, 227);
+}
+
+#tr-0 input{
+    background: transparent;
+    outline: none;
+    font-weight: 500;
+}
+
+#tr-0 input::placeholder{
+    font-style: italic;
+    color: green;
+}
+
+.h-red{
+    margin-bottom: 14px;
+}
+

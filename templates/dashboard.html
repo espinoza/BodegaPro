@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extraStyles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/stylesMantenedor.css' %}"/> 
+{% endblock %}
+
+{% block title %}RDC Pro{% endblock %}
+
+{% block content %}
+
+<div class="row">
+
+    <h3 class="col-md-6 col-9">{% if id_user == request.session.id %}
+        Mis Movimientos 
+        {% elif id_user > 0 %}
+        Movimientos de {{ user_rdc.full_name }} ({{ user_rdc.more_info.alias }})
+        {% else %}
+        Todas los Movimientos
+        {% endif %}
+        {% if tipo == "activemov" %}
+        <span class="badge rounded-pill bg-primary">Activas</span>
+        {% endif %}
+        {% if tipo == "activemov" %}
+        <a class="col blurred-link" href="{% url 'dashboard' id_user=id_user tipo='allmov' %}">Ver todas</a>
+        {% else %}
+        <a class="col blurred-link" href="{% url 'dashboard' id_user=id_user tipo='activemov' %}">Ver sólo RDC Activas</a>
+        {% endif %}
+    </h3>
+
+
+{% endblock %}

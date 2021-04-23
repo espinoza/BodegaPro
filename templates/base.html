@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block title %} BODEGA Pro {% endblock %}
+    </title>
+    
+    {% block favicon %}
+        <link rel="shortcut icon" href="{% static 'master/img/favicon.ico' %}"/>
+    {% endblock %}
+    
+    {# Block where global CSS will go. #}
+    {% block styles %}
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" 
+            rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js" 
+            integrity="sha384-SR1sx49pcuLnqZUnnPwx6FCym0wLsk5JZuNx2bPPENzswTNFaQU1RDvt3wT4gWFG" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js" 
+            integrity="sha384-j0CNLUeiqtyaRmlzUHCPZ+Gy5fQu0dQ6eZ/xAww941Ai1SxSY+0EQqNXNE6DZiVc" crossorigin="anonymous"></script>
+
+
+        <link rel="stylesheet" type="text/css" href="{% static 'master/css/styles.css' %}"/>
+    
+
+        <!--link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+            integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"-->
+
+    {% endblock %}
+
+    {# Additional CSS - specific to certain pages #}
+    {% block extraStyles %}
+    {% endblock %}
+
+    {# Scripts loaded from a CDN. #}
+    {% block cdn_scripts %}
+        <!-- jQuery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+
+        <!-- Jquery para mostrar el datePicker -->
+        <!--script src="https://code.jquery.com/jquery-3.6.0.min.js" 
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script-->
+        <!--script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" 
+            integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script-->
+        <!--link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"-->
+    {% endblock %}
+
+    {# Local scripts #}
+    {% block scripts %}
+        <script src="{% static 'master/js/functions.js' %}"></script>
+    {% endblock %}
+
+    {# Load extra scripts #}
+    {% block extraScripts %}
+    {% endblock %}
+</head>
+<body>
+
+    {% block modales %}
+    {% endblock %}
+
+    {% block menuBar %}
+    {% include "menu.html" %}
+    {% endblock %}
+    
+    <div id="container" class="bodypadding3">
+        {# El contenido master va en este bloque #}
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>

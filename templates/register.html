@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if tipo %}Nuevo Usuario{% else %}Registro{% endif %}{% endblock %}
+
+{% block extraScripts %}
+<script src="{% static 'js/functionsRegister.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="bg-grad bodywidth70 bodypadding10 mgt--40">
+
+    {% if tipo %}
+    <h3>Nuevo usuario</h3>
+    {% else %}
+    <h3>BODEGA Pro - Registro</h3>
+    {% endif %}
+
+    {% if messages %}
+    <ul class="messages">    
+        {% for message in messages %}    
+            <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>    
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <form action="" id="formulario" method="POST">
+        {% csrf_token %}
+
+        <div class="row">
+            <div class="col form-floating mb-3">
+                <input type="text" class="form-control" id="name1" name="name1" placeholder="Su nombre" 
+                    value="{{ name1 }}" onblur="chkErrores('name1')" onfocus="eraseError('name1')">
+                <label class="mgl08rem" for="name1">Nombre</label>
+            </div>
+            <!--div class="col-md-6 form-floating mb-3">
+                <input type="text" class="form-control" id="name2" name="name2" placeholder="Su segundo nombre" 
+                    value="{{ name2 }}" onblur="chkErrores('name2')" onfocus="eraseError('name2')">
+                <label class="mgl08rem" for="name2">Segundo Nombre</label>
+            </div-->
+        </div>
+        <div class="row">
+            <div class="col form-floating mb-3">
+                <input type="text" class="form-control" id="last_name1" name="last_name1" placeholder="Su apellido" 
+                    value="{{ last_name1 }}" onblur="chkErrores('last_name1')" onfocus="eraseError('last_name1')">
+                <label class="mgl08rem" for="last_name1">Apellido 1</label>
+            </div>
+            <!--div class="col-md-6 form-floating mb-3">
+                <input type="text" class="form-control" id="last_name2" name="last_name2" placeholder="Su segundo apellido" 
+                    value="{{ last_name2 }}" onblur="chkErrores('last_name2')" onfocus="eraseError('last_name2')">
+                <label class="mgl08rem" for="last_name2">Apellido 2</label>
+            </div-->
+        </div>
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="email" name="email" placeholder="su@email.porfavor" 
+                value="{{ email }}">
+            <label for="email">Email</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input type="password" class="form-control" id="password" name="password" placeholder="Elegir contraseña" 
+                onblur="chkErrores('password')" onfocus="eraseError('password')" value="{{ password }}">
+            <label for="password">Contraseña</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirmar contraseña" 
+                onblur="chkErrores('confirm_password')" onfocus="eraseError('confirm_password')" value="{{ confirm_password }}">
+            <label for="confirm_password">Confirmar Contraseña</label>
+        </div>
+
+        <div class="row mgt-1">
+            <div class="col-10">
+                <button id="btn-submit" class="btn btn-primary">{% if tipo %}Crear Cuenta{% else %}Regístrese{% endif %}</button>
+            </div>
+        </div>
+
+    </form>
+
+    {% if not tipo %}<a href="{% url 'signin' %}">Ya tiene una cuenta? Ingresar.</a>{% endif %}
+
+</div>
+{% endblock %}
