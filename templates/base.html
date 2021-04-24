@@ -6,9 +6,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
-        {% block title %} BODEGA Pro {% endblock %}
+        {% block title %} 
+        BODEGA Pro 
+        {% endblock %}
     </title>
-    
+    {% block extra_css %}
+
+    {% endblock extra_css %}
+
     {% block favicon %}
         <link rel="shortcut icon" href="{% static 'master/img/favicon.ico' %}"/>
     {% endblock %}
@@ -59,7 +64,7 @@
     {% block extraScripts %}
     {% endblock %}
 </head>
-<body>
+<body >
 
     {% block modales %}
     {% endblock %}
@@ -68,7 +73,7 @@
     {% include "menu.html" %}
     {% endblock %}
     
-    <div id="container" class="bodypadding3">
+    <div id="container">
         {# El contenido master va en este bloque #}
         {% block content %}
         {% endblock %}

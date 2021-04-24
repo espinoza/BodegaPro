@@ -85,7 +85,7 @@ WSGI_APPLICATION = 'BodegaPro.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'bodegapro_db',
+        'NAME': 'bodegapro',
         'USER': 'postgres',
         'PASSWORD': 'root',
         'HOST': '127.0.0.1',
