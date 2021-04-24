@@ -6,41 +6,57 @@
 {% block menuBar %}
 {% endblock %}
 
+{%block extra_css%}
+    <link rel="stylesheet" type="text/css" href="{%static 'css/styles.css'%}">
+{%endblock %}
 {% block content %}
-<div class="bg-grad bodywidth70 bodypadding10">
-
-    <h3>Bodega Pro - Login</h3>
-
-    {% if messages %}
-    <ul class="messages">    
-        {% for message in messages %}    
-            <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>    
-        {% endfor %}
-    </ul>
-    {% endif %}
-
-    <form action="" id="formulario" method="POST">
-        {% csrf_token %}
-        <div class="form-floating mb-3">
-            <input type="text" class="form-control" id="email" name="email" placeholder="Email" 
-                value="{{ email }}">
-            <label for="email">Email</label>
-        </div>
-        <div class="form-floating mb-3">
-            <input type="password" class="form-control" id="password" name="password" 
-            placeholder="Contraseña" value="{{ password }}"> 
-            <label for="network">Contraseña</label>
-        </div>
-        <div class="row mgt-1">
-            <div class="col-10">
-                <button id="btn-submit" class="btn btn-primary">Ingresar</button>
+<div id="layoutAuthentication">
+            <div id="layoutAuthentication_content">
+                <main>
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-5">
+                                <div class="card shadow-lg border-0 rounded-lg mt-5">
+                                    <div class="card-header"><h3 class="text-center font-weight-light my-4">Login</h3></div>
+                                    <form action="" id="formulario" method="POST">
+                                        <div class="card-body">
+                                            <form>
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="inputEmailAddress">Email</label>
+                                                    <input class="form-control py-4" value="{{ email }}" id="inputEmailAddress" type="email" placeholder="Ingrese su mail" />
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="inputPassword">Constraseña</label>
+                                                    <input value="{{ password }}" class="form-control py-4" id="inputPassword" type="password" placeholder="Ingrese contraseña" />
+                                                </div>
+                                                <div class="form-group text-center mt-4 mb-0" ">
+                                                    <a class="btn btn-primary w-50" href="index.html">Ingresar</a>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </form>
+                                    <div class="card-footer text-center">
+                                        <div class="small"><a href="{% url 'register' %}">No tiene cuenta? Regístrese.</a></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+            <div id="layoutAuthentication_footer">
+                <footer class="py-4 bg-light mt-auto">
+                    <div class="container-fluid">
+                        <div class="d-flex align-items-center justify-content-between small">
+                            <div class="text-muted">Copyright &copy; George Company</div>
+                            <div class="text-muted">2021</div>
+                        </div>
+                    </div>
+                </footer>
             </div>
         </div>
-
-    </form>
-
-    <a href="{% url 'register' %}">No tiene cuenta? Regístrese.</a>
-
-</div>
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+        <script src="js/scripts.js"></script>
 
 {% endblock %}
