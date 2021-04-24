@@ -148,16 +148,16 @@ class User(models.Model):
         return f"{self.name1} {self.last_name1}"
 
     # @property
-    def puedeSolicitar(self):
-        return self.areas_para_solicitar.count() > 0
+    #def puedeSolicitar(self):
+    #    return self.areas_para_solicitar.count() > 0
 
     # @property
-    def puedeAutorizar(self):
-        return self.areas_para_autorizar.count() > 0
+    #def puedeAutorizar(self):
+    #    return self.areas_para_autorizar.count() > 0
 
     # @property
-    def puedeEjecutar(self):
-        return self.areas_para_ejecutar.count() > 0
+    #def puedeEjecutar(self):
+    #    return self.areas_para_ejecutar.count() > 0
 
     @property
     def isAdmin(self):
