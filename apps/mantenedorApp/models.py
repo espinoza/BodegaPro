@@ -1,7 +1,7 @@
 
 from django.db.models.fields.related import OneToOneField
 from django.db import models
-from django.db.models.fields import CharField, DateTimeField, IntegerField, PositiveSmallIntegerField, BooleanField
+from django.db.models.fields import CharField, DateTimeField, IntegerField, PositiveSmallIntegerField, BooleanField, SmallIntegerField
 
 
 class MantenedorManager(models.Manager):
@@ -65,6 +65,7 @@ class Estado(models.Model):
 class Folio(models.Model):
     #tipo_mov - TipoMov
     num_folio = IntegerField()
+    signo_stock = SmallIntegerField(default=1)
 
 
 class TipoMov(models.Model):
