@@ -18,7 +18,7 @@
           </li>
           {% endif %}
           <li class="nav-item">
-            <a class="nav-link" href="#">Reportes...</a>
+            <a class="nav-link active" href="{% url 'viewproductos' %}">Stock</a>
           </li>
         </ul>
         <div class="nav-item dropdown mg-auto">
@@ -31,6 +31,7 @@
               <li><a class="dropdown-item" href="{% url 'usuarios' %}">Usuarios</a></li>
               {% endif %}
               {% if user.isAdmin %}
+              <li><a class="dropdown-item" href="{% url 'editproductos' %}">Maestro Productos</a></li>
               <li><a class="dropdown-item" href="{% url 'mantenedor' tabla_name='area' %}">Mantenedor</a></li>
               {% endif %}
               <li><a class="dropdown-item" href="{% url 'signout' %}">Cerrar Sesión</a></li>
