@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extraStyles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/stylesMantenedor.css' %}"/> 
+<link rel="stylesheet" type="text/css" href="{% static 'css/stylesPermisos.css' %}"/> 
+{% endblock %}
+
+{% block title %}Usuarios BodegaPRO{% endblock %}
+
+{% block extraScripts %}
+<script src="{% static 'js/functionsPermisos.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+<form action="{% url 'savepermisos' id_user=user_edit.id %}" id="form_permisos" method="POST">
+
+    {% csrf_token %}
+
+    {% if user.isAdmin %} {# SIEMPRE ES ADMIN!! #}
+    <div class="row">
+        <h4 class="col-md-6">Permisos para {{ user_edit.full_name }} ({{ user_edit.more_info.alias }})</h4>
+
+        <div class="col-md-3 col-6 form-floating mb-3">
+            <select class="form-select iblock-vatop" name="id_tipo_mov" id="tipo_mov">
+                {% for tipo_mov in tipos_mov %}
+                <option value="{{ tipo_mov.id }}"
+                {% if id_tipo_mov == tipo_mov.id %}selected{% endif %}>{{ tipo_mov.name }}</option>
+                {% endfor %}
+            </select>
+            <label for="tipo_mov" class="mgl08rem">Tipo Mov</label>
+        </div>
+
+        <button class="btn btn-success col-md-3 col-6 h-red" id="btn-submit">Guardar Permisos</button>
+    </div>
+    {% else %}
+    <h4>Permisos para {{ user_edit.full_name }} ({{ user_edit.more_info.alias }})</h4>
+    {% endif %}
+
+    {% if messages %}
+    <ul class="messages">    
+        {% for message in messages %}    
+            <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>    
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <table class="table table-striped" id="table-permisos">
+        <thead>
+        <tr>
+            <th scope="col">Area</th>
+            <th scope="col">Puede Solicitar | Autorizar | Ejecutar</th>
+        </tr>
+        </thead>
+        {% for tipo_mov_id, areas in tabla_permisos.items %}
+        <tbody id="table-body-{{ tipo_mov_id }}">
+            {% for area in areas %}
+            <tr id="area-{{ area.area_id }}-{{ tipo_mov_id }}">
+                <input type="hidden" id="input-{{ area.area_id }}-{{ tipo_mov_id }}" name="{{ area.area_id }}-{{ tipo_mov_id }}" 
+                value="{% if area.user_solicita %}1{% else %}0{% endif %}{% if area.user_autoriza %}1{% else %}0{% endif %}{% if area.user_ejecuta %}1{% else %}0{% endif %}">
+                <td scope="col">{{ area.area_name }}</td>
+                
+                <td scope="col">
+                
+                    {% if area.user_solicita %}
+                    <p class="btn btn-success btn-permiso" id="{{area.area_id}}-{{ tipo_mov_id }}-solicita">SI</p>
+                    {% else %}
+                    <p class="btn btn-outline-danger btn-permiso" id="{{area.area_id}}-{{ tipo_mov_id }}-solicita">NO</p>
+                    {% endif %}
+                    
+                    {% if area.user_autoriza %}
+                    <p class="btn btn-success btn-permiso" id="{{area.area_id}}-{{ tipo_mov_id }}-autoriza">SI</p>
+                    {% else %}
+                    <p class="btn btn-outline-danger btn-permiso" id="{{area.area_id}}-{{ tipo_mov_id }}-autoriza">NO</p>
+                    {% endif %}
+
+                    {% if area.user_ejecuta %}
+                    <p class="btn btn-success btn-permiso" id="{{area.area_id}}-{{ tipo_mov_id }}-ejecuta">SI</p>
+                    {% else %}
+                    <p class="btn btn-outline-danger btn-permiso" id="{{area.area_id}}-{{ tipo_mov_id }}-ejecuta">NO</p>
+                    {% endif %}
+
+                </td>
+
+            </tr>
+            {% endfor %}
+
+        </tbody>
+        {% endfor %}
+    </table>
+    
+
+</form>
+
+<script>
+    showCurrentTablaPermisos()
+</script>
+
+{% endblock %}

@@ -18,8 +18,23 @@
           </li>
           {% endif %}
           <li class="nav-item">
-            <a class="nav-link" href="#">Reportes...</a>
+            <a class="nav-link active" href="{% url 'viewproductos' %}">Stock</a>
           </li>
+          {% if goBack == 'users' %}
+          <li class="nav-item mg-auto"><a class="nav-link active" aria-current="page" href="{% url 'usuarios' %}">Panel de Usuarios</a></li>
+          {% elif goBack == '' %}
+          {# nada #}
+          {% else %}
+            {% if user.puedeAutorizar or user.puedeEjecutar or user.isAdmin %}
+            <li class="nav-item mg-auto">
+              <a class="nav-link active" aria-current="page" href="{% url 'dashboard' id_user='0' tipo='activemov' %}">Movimientos</a>
+            </li>
+            {% elif user.puedeSolicitar or user.isAdmin %}
+            <li class="nav-item mg-auto">
+              <a class="nav-link active" aria-current="page" href="{% url 'dashboard' id_user=request.session.id tipo='activemov' %}">Movimientos</a>
+            </li>
+            {% endif %}
+          {% endif %}
         </ul>
         <div class="nav-item dropdown mg-auto">
             <span class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -31,6 +46,7 @@
               <li><a class="dropdown-item" href="{% url 'usuarios' %}">Usuarios</a></li>
               {% endif %}
               {% if user.isAdmin %}
+              <li><a class="dropdown-item" href="{% url 'editproductos' %}">Maestro Productos</a></li>
               <li><a class="dropdown-item" href="{% url 'mantenedor' tabla_name='area' %}">Mantenedor</a></li>
               {% endif %}
               <li><a class="dropdown-item" href="{% url 'signout' %}">Cerrar Sesión</a></li>
