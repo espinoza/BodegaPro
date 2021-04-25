@@ -45,7 +45,7 @@ class Area(models.Model):
     #users_que_autorizan = models.ManyToManyField(User,related_name='areas_que_autorizan')
     #users_que_ejecutan = models.ManyToManyField(User,related_name='areas_que_ejecuta')
     def __str__(self):
-        return f"Usuario {self.name}, actualmente activa: {self.is_active}"
+        return f"Area {self.name}, actualmente activa: {self.is_active}"
 
     objects = MantenedorManager()
 
