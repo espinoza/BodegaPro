@@ -118,7 +118,8 @@ def viewUser(request,id_user):
 
     context = {
         'user_view' : users[0],
-        'user' : user
+        'user' : user,
+        'goBack' : 'users',
     }
 
     return render(request,"viewuser.html",context)
@@ -135,6 +136,7 @@ def newUser(request):
     context = {
         'tipo' : 'create_user',
         'user' : user,
+        'goBack' : 'users',
     }
 
     if request.method == 'POST': #esto para evitar que se entre directo a esta ruta
@@ -293,6 +295,7 @@ def renderUser(request,user_edit):
         'user' : User.objects.get(id = request.session['id']),
         'user_edit' : user_edit,
         'areas' : Area.objects.filter(is_active = True),
+        'goBack' : 'users',
     }
 
     return render(request,"edituser.html",context)
@@ -325,6 +328,7 @@ def permisosUser(request,id_user, id_tipo_mov):
         'tabla_permisos' : getTablaPermisos(id_user), #conseguir areas_que_rinde, autoriza, paga
         'tipos_mov' : tipos_mov,
         'id_tipo_mov' : id_tipo_mov,
+        'goBack' : 'users',
     }
 
     return render(request,"permisos.html",context)
