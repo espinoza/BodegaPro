@@ -48,7 +48,7 @@
                 {% if user.isAdmin and user_i.id != request.session.id %}
                     {% if user_i.is_active %}
                         {% if not user_i.isAdmin %}
-                        <a class="btn btn-outline-secondary" href="{% url 'permisosuser' id_user=user_i.id  %}">Permisos</a>
+                        <a class="btn btn-outline-secondary" href="{% url 'permisosuser' id_user=user_i.id id_tipo_mov=0 %}">Permisos</a>
                         {% endif %}
                         <button class="btn btn-outline-danger" id="desactivar-{{ user_i.id }}">Desactivar</button>
                     {% else %}

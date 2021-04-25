@@ -16,7 +16,7 @@
 {% if user.isAdmin and not user_edit.isAdmin %}
 <div class="row">
     <h3 class="col-9">{{ user_edit.full_name }} ({{ user_edit.more_info.alias }})</h3>
-    <a class="btn btn-success col-3 h-red mg-auto" href="{#% url 'permisosuser' id_user=user_edit.id %#}">Editar Permisos...</a>
+    <a class="btn btn-success col-3 h-red mg-auto" href="{% url 'permisosuser' id_user=user_edit.id id_tipo_mov=0 %}">Editar Permisos...</a>
 </div>
 {% else %}
 <h3 class="col-9">{{ user_edit.full_name }} ({{ user_edit.more_info.alias }})</h3>
@@ -33,36 +33,36 @@
 <br>
 
 <!--PERMISOS-->
-<!--
+
 {% if not user_edit.isAdmin %}
 <div style="margin-top: -20px;">
-{% if user_edit.puedeRendir %}
-<p style="color: #198754; font-weight:600; margin-bottom: 5px;">Rinde en:
-{% for area in user_edit.areas_que_rinde.all %}
-<span class="badge rounded-pill bg-success">{{ area.name }}</span>
+{% if user_edit.puedeSolicitar %}
+<p style="color: #198754; font-weight:600; margin-bottom: 5px;">Solicita en:
+{% for areamov in user_edit.areastipomov_donde_solicita.all %}
+<span class="badge rounded-pill bg-success">{{ areamov.tipo_mov.name }}: {{ areamov.area.name }}</span>
 {% endfor %}
 </p>
 {% endif %}
 
 {% if user_edit.puedeAutorizar %}
 <p style="color: #ffc107; font-weight:600; margin-bottom: 5px;">Autoriza en:
-{% for area in user_edit.areas_que_autoriza.all %}
-<span class="badge rounded-pill bg-warning">{{ area.name }}</span>
+{% for areamov in user_edit.areastipomov_donde_autoriza.all %}
+<span class="badge rounded-pill bg-warning">{{ areamov.tipo_mov.name }}: {{ areamov.area.name }}</span>
 {% endfor %}
 </p>
 {% endif %}
 
-{% if user_edit.puedePagar %}
-<p style="color: #dc3545; font-weight:600;">Paga en:
-{% for area in user_edit.areas_que_paga.all %}
-<span class="badge rounded-pill bg-danger">{{ area.name }}</span>
+{% if user_edit.puedeEjecutar %}
+<p style="color: #dc3545; font-weight:600;">Ejecuta en:
+{% for areamov in user_edit.areastipomov_donde_ejecuta.all %}
+<span class="badge rounded-pill bg-danger">{{ areamov.tipo_mov.name }}: {{ areamov.area.name }}</span>
 {% endfor %}
 </p>
 {% endif %}
 
 </div>
 {% endif %}
--->
+
 
 <!--FORMS-->
 <div class="row">

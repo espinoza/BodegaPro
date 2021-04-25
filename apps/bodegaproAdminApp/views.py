@@ -2,8 +2,8 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from .models import ProxyUser
-from apps.loginApp.models import User
-from apps.loginApp.views import addToDB as addUserToDB, removeAllPermisos
+from apps.loginApp.models import User, UserAutoriza, UserEjecuta, UserSolicita
+from apps.loginApp.views import addToDB as addUserToDB, removePermisosTipoMov
 from apps.loginApp.views import addProxy0ToDB, updateProxyOnDB, updateUserOnDB
 from apps.mantenedorApp.models import Area, TipoMov
 from django.contrib import messages
@@ -23,15 +23,20 @@ def getTablaPermisos(id_user):
 
     for tipo_mov in tipos_mov:
 
+        tipoMov = []
+
         for area in areas:
             miDict = {
                 'area_id': area.id,
                 'area_name': area.name,
-                'user_solicita' : len(area.users_que_solicitan.filter(id = id_user,tipo_mov = tipo_mov)) > 0,
-                'user_autoriza' : len(area.users_que_autorizan.filter(id = id_user,tipo_mov = tipo_mov)) > 0,
-                'user_ejecuta' : len(area.users_que_ejecutan.filter(id = id_user,tipo_mov = tipo_mov)) > 0,
+                'user_solicita' : len(area.userstipomov_que_solicitan.filter(user__id=id_user,tipo_mov__id = tipo_mov.id)) > 0,
+                'user_autoriza' : len(area.userstipomov_que_autorizan.filter(user__id=id_user,tipo_mov__id = tipo_mov.id)) > 0,
+                'user_ejecuta' : len(area.userstipomov_que_ejecutan.filter(user__id=id_user,tipo_mov__id = tipo_mov.id)) > 0,
             }
-            tablaPermisos[tipo_mov.name] = miDict
+            tipoMov.append(miDict)
+        
+        tablaPermisos[tipo_mov.id] = tipoMov
+
 
     return tablaPermisos
 
@@ -39,25 +44,46 @@ def savePermisos(post_data,id_user):
 
     user = User.objects.get(id = id_user)
 
-    removeAllPermisos(user.id)
+    try:
+        tipo_mov = TipoMov.objects.get(id = int(post_data['id_tipo_mov']))
+    except:
+        return False
+ 
+    removePermisosTipoMov(user.id,tipo_mov)
 
     for key in post_data:
 
-        if key.isnumeric():
+        if key[0].isnumeric() and int(key[-1]) == tipo_mov.id:
 
             solicita = int(post_data[key][0])
             autoriza = int(post_data[key][1])
             ejecuta = int(post_data[key][2])
-            id_area = int(key)  
+            id_area = int(key.split('-')[0])  
+
+            print(f'guardando {key}, id_area {id_area}')
 
             area = Area.objects.get(id = id_area)
             if solicita == 1:
-                user.areas_que_rinde.add(area)
+                print(f'solicita area {area.name}, tipo_mov {tipo_mov.name}')
+                UserSolicita.objects.create(
+                    tipo_mov=tipo_mov,
+                    user=user,
+                    area=area
+                )
             if autoriza == 1:
-                user.areas_que_autoriza.add(area)
+                UserAutoriza.objects.create(
+                    tipo_mov=tipo_mov,
+                    user=user,
+                    area=area
+                )
             if ejecuta == 1:
-                user.areas_que_ejecuta.add(area)
+                UserEjecuta.objects.create(
+                    tipo_mov=tipo_mov,
+                    user=user,
+                    area=area
+                )
 
+    return tipo_mov.name
 
 
 #ROUTES
@@ -272,7 +298,7 @@ def renderUser(request,user_edit):
     return render(request,"edituser.html",context)
 
 
-def permisosUser(request,id_user):
+def permisosUser(request,id_user, id_tipo_mov):
     if 'id' not in request.session or not request.session['is_active']:
         return redirect('signin')
 
@@ -285,10 +311,20 @@ def permisosUser(request,id_user):
     if not user.isAdmin or user_edit.isAdmin:
         return redirect('usuarios')
 
+    tipos_mov = TipoMov.objects.filter(is_active = True).order_by('pos')
+    if int(id_tipo_mov) == 0:
+        try:
+            id_tipo_mov = tipos_mov[0].id
+        except:
+            pass
+
+
     context = {
         'user' : user,
         'user_edit' : user_edit,
         'tabla_permisos' : getTablaPermisos(id_user), #conseguir areas_que_rinde, autoriza, paga
+        'tipos_mov' : tipos_mov,
+        'id_tipo_mov' : id_tipo_mov,
     }
 
     return render(request,"permisos.html",context)
@@ -308,11 +344,12 @@ def savePermisosUser(request,id_user):
 
     if request.method == "POST":
 
-        savePermisos(request.POST,id_user)
+        print(request.POST)
+        tipo_mov_txt = savePermisos(request.POST,id_user)
 
-        messages.success(request, f"Permisos guardados!")
+        messages.success(request, f"Permisos guardados ({ tipo_mov_txt })!")
 
-        return redirect('permisosuser',id_user = id_user)
+        return redirect('permisosuser',id_user = id_user, id_tipo_mov=request.POST['id_tipo_mov'])
 
     else:
 

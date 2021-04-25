@@ -105,6 +105,12 @@ def removeAllPermisos(id_user):
     user.areas_para_autorizar.clear()
     user.areas_para_ejecutar.clear()
 
+def removePermisosTipoMov(id_user,tipo_mov):
+    user = User.objects.get(id = id_user)
+    user.areastipomov_donde_solicita.filter(tipo_mov_id=tipo_mov.id).delete()
+    user.areastipomov_donde_autoriza.filter(tipo_mov_id=tipo_mov.id).delete()
+    user.areastipomov_donde_ejecuta.filter(tipo_mov_id=tipo_mov.id).delete()
+
 
 #MISC FUNCTIONS
 def passEncryptDecoded(passwd):
