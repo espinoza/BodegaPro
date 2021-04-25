@@ -6,12 +6,14 @@ from apps.bodegaproAdminApp.models import ProxyUser
 #from apps.rdcAdminApp.views import addProxy0ToDB
 import bcrypt
 from django.contrib import messages
+import os
 
 DATE_FORMAT = "%Y-%m-%d"
 SESSION_KEYS = [
     'id',
     'name',
     'is_active',
+    'super_admin',
 ]
 
 
@@ -25,6 +27,8 @@ def addSession(request,user):
     request.session["id"] = user.id
     request.session["name"] = f"{user.name1}"
     request.session["is_active"] = user.is_active
+    if user.email == os.environ["SUPER_ADMIN"]:
+        request.session["super_admin"] = True
 
 #CRUD
 
