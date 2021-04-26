@@ -2,10 +2,19 @@
 {% load static %}
 
 {% block content %}
+
+{% if mov_encabezado %}
+{{mov_encabezado.tipo_mov.name}}
+folio: {{mov_encabezado.folio}}
+{% endif %}
 <form method="POST">
     {% csrf_token %}
     {{form}}
-    <input class="btn btn-success" type="submit" value="Crear">
+    <input class="btn btn-success" type="submit" value="{{button_txt}}">
 </form>
+
+{% if mov_encabezado %}
+{{mov_encabezado.estado}}
+{% endif %}
 
 {% endblock %}
