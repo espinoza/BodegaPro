@@ -137,6 +137,6 @@ class MovEstado(models.Model):
     updated_at = DateTimeField(auto_now=True)
 
 class Stock(models.Model):
-    producto = models.ForeignKey(Producto,related_name="stock_data",on_delete=models.CASCADE)
-    cantidad = models.FloatField()
-    monto_total = models.FloatField()
+    producto = models.OneToOneField(Producto,related_name="stock_data",on_delete=models.CASCADE)
+    cantidad = models.FloatField(default=0)
+    monto_total = models.FloatField(default=0)

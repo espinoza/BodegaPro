@@ -7,4 +7,5 @@ urlpatterns = [
     #rdc/...
     path('view', views.gotoProductos, name='viewproductos'),
     path('edit', views.editProductos, name='editproductos'),
+    path('new',views.newProduct, name='newproduct' )
 ]

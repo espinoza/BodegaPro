@@ -30,7 +30,7 @@ function toggleUser(tipo,id_user){
 
     $.ajax({
         type:"POST",
-        url: `/rdcadmin/user/${tipo}`,
+        url: `/bodegapro/admin/user/${tipo}`,
         data: data,
         dataType:"JSON",
     })
