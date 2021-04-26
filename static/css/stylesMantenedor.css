@@ -21,3 +21,14 @@
     margin-bottom: 14px;
 }
 
+.avatar{
+    vertical-align: middle;
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+}
+
+#file-upload-button{
+    background-color: green;
+}
+

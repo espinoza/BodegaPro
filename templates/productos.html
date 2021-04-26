@@ -2,15 +2,126 @@
 {% load static %}
 
 {% block extraStyles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/stylesMantenedor.css' %}"/> 
 {% endblock %}
 
-{% block title %}BodegaPro Productos{% endblock %}
+{% block title %}BodegaPro - Productos{% endblock %}
 
 {% block extraScripts %}
+<script src="{% static 'js/functionsProductos.js' %}"></script>
 {% endblock %}
 
 {% block content %}
 
-<h3>Productos ({{ tipo }})</h3>
+<h3>Maestro de Productos</h3>
+
+{% if messages %}
+<ul class="messages">    
+    {% for message in messages %}    
+        <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>    
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% if tipo == 'edit' %}
+<form action="{% url 'newproduct' %}" id="form-add-item" enctype="multipart/form-data" method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-2 form-floating mb-3">
+            <input type="text" class="form-control" id="cod" name="cod" placeholder="Código" 
+                value="{{ new_product.cod }}" onblur="chkErrores('cod')" onfocus="eraseError('cod')">
+            <label class="mgl08rem" for="cod">Cód</label>
+        </div>
+        <div class="col-md-3 form-floating mb-3">
+            <input type="text" class="form-control" id="name" name="name" placeholder="Descripción" 
+                value="{{ new_product.name }}" onblur="chkErrores('name')" onfocus="eraseError('descripcion')">
+            <label class="mgl08rem" for="name">Descripción</label>
+        </div>
+        <div class="col-md-1 form-floating mb-3">
+            <select class="form-select" name="unidad_medida" id="unidad_medida">
+                {% if not new_product.unidad_medida %}
+                <option value="0" selected disabled>Unidad...</option>
+                {% endif %}
+                {% for unidad in unidades %}
+                <option value="{{ unidad.id }}" 
+                {% if new_product.unidad_medida and new_product.unidad_medida == unidad.id %}selected{% endif %}>{{ unidad.name }}</option>
+                {% endfor %}
+            </select>
+            <!--label for="unidad_medida">Unidad</label-->
+        </div>
+        <div class="col-md-2 form-floating mb-3">
+            <select class="form-select" name="familia" id="familia">
+                {% if not new_product.familia_id %}
+                <option value="0" selected disabled>Familia...</option>
+                {% endif %}
+                {% for familia in familias %}
+                <option value="{{ familia.id }}" 
+                {% if new_product.familia and new_product.familia == familia.id %}selected{% endif %}>{{ familia.name }}</option>
+                {% endfor %}
+            </select>
+            <!--label for="familia">Familia</label-->
+        </div>
+        <div class="col-md-2 form-floating mb-3">
+            <input class="form-control-file" type="file" name="img_url" style="margin-top: 20px;">
+        </div>
+        <button class="col-md-1 btn btn-success h-red mg-auto" id="btn-add-item">Agregar</button>    
+    </div>
+</form>
+
+{% endif %}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+          <th scope="col"></th>
+          <th scope="col">Cod</th>
+          <th scope="col">Descripción</th>
+          <th scope="col">Stock</th>
+          <th scope="col">Un</th>
+          <th scope="col">Familia</th>
+          <th scope="col">$ Unit</th>
+          {%if tipo == 'edit' %}<th scope="col">ST</th>
+          <th scope="col"></th>{% endif %}
+        </tr>
+    </thead>
+    <tbody id="table-body">
+        <!--dynamic content here-->
+        {% for producto in productos %}
+        <tr id="tr-{{ producto.id }}">
+            <td scope="col"><img class="avatar" src="/media/{{ producto.img_url }}" alt="Prod Img"></td>
+            <td scope="col">{{ producto.cod }}</td>
+            <td scope="col">{{ producto.name }}</td>
+            <td scope="col">{{ producto.cantidad }}</td>
+            <td scope="col">{{ producto.unidad_medida.name }}</td>
+            <td scope="col">{{ producto.familia.name }}</td>
+            <td scope="col">{{ producto.precio_unit }}</td>
+            {% if tipo == 'edit' %}
+            <td scope="col">{% if producto.is_active %}A{% else %}I{% endif %}</td>
+            <td scope="col">
+                <button class="btn btn-outline-secondary" id="{{producto.id}}" data-bs-toggle="modal" data-bs-target="#editModal">Edit</button> |
+                <button class="btn btn-outline-primary" id="img-{{ producto.id }}">IMG...</button> |
+                {% if producto.is_active %}
+                <button class="btn btn-outline-danger" id="desactivar-{{ producto.id }}">Desactivar</button>
+                {% else %}
+                <button class="btn btn-outline-success" id="activar-{{ producto.id }}">Activar</button>
+                {% endif %}
+            </td>
+            {% endif %}
+        </tr>
+        {% empty %}
+        <tr>
+            <td></td>
+            <td colspan="{% if tipo == 'view' %}7{% else %}8{% endif %}">Sin productos en esta clasificación.</td> 
+        </tr>
+        {% endfor %}
+    
+    </tbody>
+  </table>
+  <input type="hidden" value="" id="id-to-edit">
+
+
+<script>
+    cargarProductos('{{ tipo }}')
+</script>
 
 {% endblock %}
