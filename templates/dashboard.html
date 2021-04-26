@@ -5,28 +5,215 @@
 <link rel="stylesheet" type="text/css" href="{% static 'css/stylesMantenedor.css' %}"/> 
 {% endblock %}
 
-{% block title %}RDC Pro{% endblock %}
+{% block title %}BodegaPro{% endblock %}
 
 {% block content %}
+<div class="container" >
+    <div class="row">
+        <h3 class="col-md-6 col-9">
+            {% if id_user == request.session.id %}
+            Mis Movimientos 
+            {% elif id_user > 0 %}
+            Movimientos de {{ user_rdc.full_name }} ({{ user_rdc.more_info.alias }})
+            {% else %}
+            Todas los Movimientos
+            {% endif %}
+            {% if tipo == "activemov" %}
+            <span class="badge rounded-pill bg-primary">Activas</span>
+            {% endif %}
+            {% if tipo == "activemov" %}
+            <a class="col blurred-link" href="{% url 'dashboard' id_user=id_user tipo='allmov' %}">Ver todas</a>
+            {% else %}
+            <span class="badge rounded-pill bg-primary">Todas</span>
+            <a class="col blurred-link" href="{% url 'dashboard' id_user=id_user tipo='activemov' %}">Solo Activas</a>
+            {% endif %}
+        </h3>
+        <div class="col">
+            <div class="container-fluid">
+                <form class="row" action="/crear/area/tipo/usuario" method="post">
+                    {% csrf_token %}                                   
+                    <div class="col-4">
+                        <select class="form-control col-8" name="area" id="area" value="Area">
+                            <option>Area</option>
+                            {%for area in all_areas%}                            
+                            <option value="{{area.id}}">{{area.name}}</option>
+                            {%endfor%}
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <select class="form-control col-8" name="tipo_mov" id="tipo_mov" value="tipo_mov">
+                            <option>Tipo Movimiento</option>
+                            {%for tipo_mov in all_movimientos%}                            
+                            <option value="{{tipo_mov.name}}">{{tipo_mov.name}}</option>
+                            {%endfor%}
+                        </select>
+                    </div>
+                    <input class="col-4 btn btn-primary" type="submit" value="Nuevo">
+                </form>    
+            </div>
+        </div>       
+    </div>
+</div>
+<div class="container-fluid p-2">
+    <div class="row m-2">
+        <div class="col-12">
+            <div class=" container  border rounded p-3 bg-content">
+                <table class="table ">
+                    <thead class="container">
+                        <tr class="">
+                            <th scope="col-1"></th>
+                            <th scope="col-1">#</th>
+                            <th scope="col-1">E/S</th>
+                            <th scope="col-1">folio</th> 
+                            <th scope="col-1">descripción</th>                            
+                            <th scope="col-1">N Items</th>
+                            <th scope="col-1">$ Total</th>
+                            <th scope="col-1">Estado</th>
+                            <th scope="col-3 text-center">Flujo</th>                          
+                        </tr>
+                    </thead>                    
+                    <tbody>
+                        {%for encabezado in all_encabezados%} 
+                        {% if tipo == "activemov" %}
+                        {% if encabezado.estado != "CANCELADO" and encabezado.estado != "NO APROBADO" and encabezado.estado != "NO AUTORIZADO"%}                       
+                        <tr>
+                            <td scope="col-1"><a class="btn btn-sm btn-secondary" href="/pdf">PDF</a></td>
+                            <td scope="col-1">{{encabezado.id}}</td>
+                            <td scope="col-1">{%if encabezado.tipo_mov.name == 'ENTRADA'%} E {%elif encabezado.tipo_mov.name == 'SALIDA'%} S {%endif%}</td>
+                            <td scope="col-1">
+                                <a href="">00000{{encabezado.folio}}</a>
+                            </td>
+                            <td scope="col-1">{{encabezado.descripcion}}</td> 
+                            {%if encabezado.estado == "SOLICITADO"%}                        
+                            <td scope="col-1">                            
+                            {{encabezado.num_items_solicitado}}
+                            </td>
+                            <td scope="col-1">{{encabezado.monto_solicitado}}</td>
+                            {%elif encabezado.estado == "AUTORIZADO"%}
+                            <td scope="col-1">                            
+                                {{encabezado.num_items_autorizado}}
+                            </td>
+                            <td scope="col-1">{{encabezado.monto_autorizado}}</td>
+                            {%elif encabezado.estado == "EJECUTADO"%}
+                            <td scope="col-1">                            
+                                {{encabezado.num_items_ejecutado}}
+                            </td>
+                            <td scope="col-1">{{encabezado.monto_ejecutado}}</td>
+                            {%else%}
+                            <td scope="col-1">                            
+                                {{encabezado.num_items_autorizado}}
+                            </td>
+                            <td scope="col-1">{{encabezado.monto_autorizado}}</td>                                
+                            {%endif%}
+                            <td>{{encabezado.estado}}</td>
+                            <td scope="col-3">
+                                <div class="container">
+                                    <div class="row">   
+                                        <div class="col-4">                                          
+                                            {%for mov_estado in encabezado.mov_estados.all%}                                            
+                                            {%if mov_estado.estado.name == "SOLICITADO"%}                                           
+                                            <p class=" container btn btn-sm btn-success text-white">{{mov_estado.user.name1}} <br> Solicitó <br>{{mov_estado.created_at}}</p>
+                                            {%elif mov_estado.estado.name == "CREADO"%}                                            
+                                            <p class="container btn btn-sm border">{{mov_estado.user.name1}} <br> Creó <br>{{mov_estado.created_at}}</p>
+                                            {%elif mov_estado.estado.name == "CANCELADO"%}
+                                            <p class="container  btn btn-sm border">{{mov_estado.user.name1}} <br> Canceló <br>{{mov_estado.created_at}}</p>
+                                            {%endif%}
+                                            {%endfor%}
+                                        </div>
+                                        <div class="col-4">
+                                            {%for mov_estado in encabezado.mov_estados.all%} 
+                                            {%if mov_estado.estado.name == "AUTORIZADO"%} 
+                                            <p class="container  btn btn-sm btn-primary text-white">{{mov_estado.user.name1}} <br> Autorizó <br>{{mov_estado.created_at}}</p>
+                                            {%elif mov_estado.estado.name == "NO AUTORIZADO"%}  
+                                            <p class="container  btn btn-sm border">{{mov_estado.user.name1}} <br> Rechazó <br>{{mov_estado.created_at}}</p>
+                                            {%endif%}
+                                            {%endfor%}  
+                                        </div>
+                                        <div class="col-4">
+                                            {%for mov_estado in encabezado.mov_estados.all%} 
+                                            {%if mov_estado.estado.name == "EJECUTADO"%} 
+                                            <p class="container btn btn-sm btn-warning text-white">{{mov_estado.user.name1}} <br> Ejecutó <br>{{mov_estado.created_at}}</p> 
+                                            {%endif%}
+                                            {%endfor%}                                       
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>                          
+                        </tr>
+                        {%endif%}
+                        {%endif%}
+                        {% if tipo != "activemov" %}                     
+                        <tr>
+                            <td scope="col-1"><a class="btn btn-sm btn-secondary" href="/pdf">PDF</a></td>
+                            <td scope="col-1">{{encabezado.id}}</td>
+                            <td scope="col-1">{%if encabezado.tipo_mov.name == 'ENTRADA'%} E {%elif encabezado.tipo_mov.name == 'SALIDA'%} S {%endif%}</td>
+                            <td scope="col-1">
+                                <a href="">00000{{encabezado.folio}}</a>
+                            </td>
+                            <td scope="col-1">{{encabezado.descripcion}}</td> 
+                            {%if encabezado.estado == "SOLICITADO"%}                        
+                            <td scope="col-1">                            
+                            {{encabezado.num_items_solicitado}}
+                            </td>
+                            <td scope="col-1">{{encabezado.monto_solicitado}}</td>
+                            {%elif encabezado.estado == "AUTORIZADO"%}
+                            <td scope="col-1">                            
+                                {{encabezado.num_items_autorizado}}
+                            </td>
+                            <td scope="col-1">{{encabezado.monto_autorizado}}</td>
+                            {%elif encabezado.estado == "EJECUTADO"%}
+                            <td scope="col-1">                            
+                                {{encabezado.num_items_ejecutado}}
+                            </td>
+                            <td scope="col-1">{{encabezado.monto_ejecutado}}</td>
+                            {%else%}
+                            <td scope="col-1">                            
+                                {{encabezado.num_items_autorizado}}
+                            </td>
+                            <td scope="col-1">{{encabezado.monto_autorizado}}</td>                                
+                            {%endif%}
+                            <td>{{encabezado.estado}}</td>
+                            <td scope="col-3">
+                                <div class="container">
+                                    <div class="row">   
+                                        <div class="col-4">                                          
+                                            {%for mov_estado in encabezado.mov_estados.all%}                                            
+                                            {%if mov_estado.estado.name == "SOLICITADO"%}                                           
+                                            <p class=" container btn btn-sm btn-success text-white">{{mov_estado.user.name1}} <br> Solicitó <br>{{mov_estado.created_at}}</p>
+                                            {%elif mov_estado.estado.name == "CREADO"%}                                            
+                                            <p class="container btn btn-sm border">{{mov_estado.user.name1}} <br> Creó <br>{{mov_estado.created_at}}</p>
+                                            {%elif mov_estado.estado.name == "CANCELADO"%}
+                                            <p class="container  btn btn-sm border">{{mov_estado.user.name1}} <br> Canceló <br>{{mov_estado.created_at}}</p>
+                                            {%endif%}
+                                            {%endfor%}
+                                        </div>
+                                        <div class="col-4">
+                                            {%for mov_estado in encabezado.mov_estados.all%} 
+                                            {%if mov_estado.estado.name == "AUTORIZADO"%} 
+                                            <p class="container  btn btn-sm btn-primary text-white">{{mov_estado.user.name1}} <br> Autorizó <br>{{mov_estado.created_at}}</p>
+                                            {%elif mov_estado.estado.name == "NO AUTORIZADO"%}  
+                                            <p class="container  btn btn-sm border">{{mov_estado.user.name1}} <br> Rechazó <br>{{mov_estado.created_at}}</p>
+                                            {%endif%}
+                                            {%endfor%}  
+                                        </div>
+                                        <div class="col-4">
+                                            {%for mov_estado in encabezado.mov_estados.all%} 
+                                            {%if mov_estado.estado.name == "EJECUTADO"%} 
+                                            <p class="container btn btn-sm btn-warning text-white">{{mov_estado.user.name1}} <br> Ejecutó <br>{{mov_estado.created_at}}</p> 
+                                            {%endif%}
+                                            {%endfor%}                                       
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>                          
+                        </tr>
+                        {%endif%}
+                        {%endfor%}                                              
+                    </tbody>
+                </table>
+            </div>
+        </div> 
 
-<div class="row">
-
-    <h3 class="col-md-6 col-9">{% if id_user == request.session.id %}
-        Mis Movimientos 
-        {% elif id_user > 0 %}
-        Movimientos de {{ user_rdc.full_name }} ({{ user_rdc.more_info.alias }})
-        {% else %}
-        Todas los Movimientos
-        {% endif %}
-        {% if tipo == "activemov" %}
-        <span class="badge rounded-pill bg-primary">Activas</span>
-        {% endif %}
-        {% if tipo == "activemov" %}
-        <a class="col blurred-link" href="{% url 'dashboard' id_user=id_user tipo='allmov' %}">Ver todas</a>
-        {% else %}
-        <a class="col blurred-link" href="{% url 'dashboard' id_user=id_user tipo='activemov' %}">Ver sólo RDC Activas</a>
-        {% endif %}
-    </h3>
 
 
 {% endblock %}
