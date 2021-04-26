@@ -33,8 +33,8 @@
                 <form class="row" action="/crear/area/tipo/usuario" method="post">
                     {% csrf_token %}                                   
                     <div class="col-4">
-                        <select class="form-control col-8" name="area" id="area" value="Area">
-                            <option>Area</option>
+                        <select class="form-control col-8" name="area" id="area" value="Area" placeholder="Area">
+                            <option selected disabled>Area</option>
                             {%for area in all_areas%}                            
                             <option value="{{area.id}}">{{area.name}}</option>
                             {%endfor%}
@@ -42,14 +42,15 @@
                     </div>
                     <div class="col-4">
                         <select class="form-control col-8" name="tipo_mov" id="tipo_mov" value="tipo_mov">
-                            <option>Tipo Movimiento</option>
+                            <option selected disabled>Tipo Movimiento</option>
                             {%for tipo_mov in all_movimientos%}                            
                             <option value="{{tipo_mov.name}}">{{tipo_mov.name}}</option>
                             {%endfor%}
                         </select>
                     </div>
                     <input class="col-4 btn btn-primary" type="submit" value="Nuevo">
-                </form>    
+                </form>  
+                <p class="text-center text-danger font wheigh-light">error aqui</p>  
             </div>
         </div>       
     </div>
