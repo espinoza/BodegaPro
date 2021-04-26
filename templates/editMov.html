@@ -4,17 +4,19 @@
 {% block content %}
 
 {% if mov_encabezado %}
-{{mov_encabezado.tipo_mov.name}}
-folio: {{mov_encabezado.folio}}
+<p>{{mov_encabezado.tipo_mov.name}}</p>
+<p>folio: {{mov_encabezado.folio}}</p>
 {% endif %}
-<form method="POST">
-    {% csrf_token %}
-    {{form}}
-    <input class="btn btn-success" type="submit" value="{{button_txt}}">
-</form>
+<div>
+    <form method="POST">
+        {% csrf_token %}
+        {{form}}
+        <input class="btn btn-success" type="submit" value="{{button_txt}}">
+    </form>
+</div>
 
 {% if mov_encabezado %}
-{{mov_encabezado.estado}}
+    <p>{{mov_encabezado.estado}}</p>
 {% endif %}
 
 {% endblock %}
