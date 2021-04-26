@@ -41,8 +41,8 @@ def requestNewMov(request):
             user = User.objects.filter(id=request.session["id"])
             if user:
                 logged_user = user[0]
-                area_id = request.POST["area_id"]
-                tipo_mov_id = request.POST["tipo_mov_id"]
+                area_id = request.POST["area"]
+                tipo_mov_id = request.POST["tipo_mov"]
                 return redirect("/movs/new?area=" + str(area_id) + "&"
                                 + "tipo_mov=" + str(tipo_mov_id))
     return redirect("/")

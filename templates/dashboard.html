@@ -30,7 +30,7 @@
         </h3>
         <div class="col">
             <div class="container-fluid">
-                <form class="row" action="/crear/area/tipo/usuario" method="post">
+                <form class="row" action="{% url 'request_new_mov' %}" method="post">
                     {% csrf_token %}                                   
                     <div class="col-4">
                         <select class="form-control col-8" name="area" id="area" value="Area">
@@ -44,7 +44,7 @@
                         <select class="form-control col-8" name="tipo_mov" id="tipo_mov" value="tipo_mov">
                             <option>Tipo Movimiento</option>
                             {%for tipo_mov in all_movimientos%}                            
-                            <option value="{{tipo_mov.name}}">{{tipo_mov.name}}</option>
+                            <option value="{{tipo_mov.id}}">{{tipo_mov.name}}</option>
                             {%endfor%}
                         </select>
                     </div>
@@ -81,7 +81,7 @@
                             <td scope="col-1">{{encabezado.id}}</td>
                             <td scope="col-1">{%if encabezado.tipo_mov.name == 'ENTRADA'%} E {%elif encabezado.tipo_mov.name == 'SALIDA'%} S {%endif%}</td>
                             <td scope="col-1">
-                                <a href="">00000{{encabezado.folio}}</a>
+                                <a href="{% url 'goto_mov' encabezado.id %}">00000{{encabezado.folio}}</a>
                             </td>
                             <td scope="col-1">{{encabezado.descripcion}}</td> 
                             {%if encabezado.estado == "SOLICITADO"%}                        
