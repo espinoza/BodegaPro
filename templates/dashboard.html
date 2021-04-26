@@ -49,8 +49,7 @@
                         </select>
                     </div>
                     <input class="col-4 btn btn-primary" type="submit" value="Nuevo">
-                </form>  
-                <p class="text-center text-danger font wheigh-light">error aqui</p>  
+                </form>                   
             </div>
         </div>       
     </div>
@@ -76,7 +75,7 @@
                     <tbody>
                         {%for encabezado in all_encabezados%} 
                         {% if tipo == "activemov" %}
-                        {% if encabezado.estado != "CANCELADO" and encabezado.estado != "NO APROBADO" and encabezado.estado != "NO AUTORIZADO" and encabezado.estado != "CREADO"%}                       
+                        {% if encabezado.estado != "CANCELADO" and encabezado.estado != "NO APROBADO" and encabezado.estado != "NO AUTORIZADO" and encabezado.estado != "CREADO" and encabezado.estado != "EJECUTADO"%}                       
                         <tr class="bg-light">
                             <td scope="col-1"><a class="btn btn-sm btn-secondary" href="/pdf">PDF</a></td>
                             <td scope="col-1">{{encabezado.id}}</td>
