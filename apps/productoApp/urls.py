@@ -5,6 +5,6 @@ from . import views
 
 urlpatterns = [
     #rdc/...
-    path('', views.gotoProductos, name='productos'),
-
+    path('view', views.gotoProductos, name='viewproductos'),
+    path('edit', views.editProductos, name='editproductos'),
 ]

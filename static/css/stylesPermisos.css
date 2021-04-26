@@ -1,0 +1,15 @@
+#table-permisos{
+    width:50%;
+    margin-left:10%;
+}
+
+.btn-permiso{
+    min-width:60px;
+}
+
+@media screen and (max-width: 600px) {
+    #table-permisos{
+        width:100%;
+        margin-left:inherit;
+    }
+}

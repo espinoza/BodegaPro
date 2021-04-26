@@ -10,13 +10,13 @@ EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
 
 class UserManager(models.Manager):
 
-    #    def areasQue(self, tipo: str, tipo_mov, user_id): #tipo: 'solicita', 'autoriza', 'ejecuta'
-    #        if tipo[:3] == 'sol':
-    #            return self.get(id = user_id).areas_que_solicita.filter(tipo_mov)
-    #        elif tipo[:3] == 'aut':
-    #            return self.get(id = user_id).areas_que_autoriza.filter(tipo_mov)
-    #        elif tipo[:3] == 'eje':
-    #            return self.get(id = user_id).areas_que_ejecuta.filter(tipo_mov)
+    def areasQue(self, tipo: str, tipo_mov, user_id): #tipo: 'solicita', 'autoriza', 'ejecuta'
+        if tipo[:3] == 'sol':
+            return self.filter(id = user_id, areas_para_solicitar__tipo_mov__name=tipo_mov)
+        elif tipo[:3] == 'aut':
+            return self.filter(id = user_id, areas_para_autorizar__tipo_mov__name=tipo_mov)
+        elif tipo[:3] == 'eje':
+            return self.filter(id = user_id, areas_para_ejecutar__tipo_mov__name=tipo_mov)
 
     def chk_pass(self, email, passwd):
         user = self.filter(email=email)
@@ -135,29 +135,51 @@ class User(models.Model):
     areas_para_ejecutar = models.ManyToManyField(
         Area, through="UserEjecuta", related_name="users_que_ejecutan")
 
-    #mis_mov - MovEncabezado
-    #mov_autorizados - MovEstado
-    #mov_pagados - MovEstado
+    #movs_asociados - MovEstado
 
     def __str__(self):
         return f"Usuario {self.name1} {self.last_name1}"
     objects = UserManager()
 
+    @property 
+    def movs_creados(self):
+        return self.movs_asociados.filter(estado__name='CREADO').mov_encabezado.all()
+
+    @property 
+    def movs_solicitados(self):
+        return self.movs_asociados.filter(estado__name='SOLICITADO').mov_encabezado.all()
+
+    @property 
+    def movs_autorizados(self):
+        return self.movs_asociados.filter(estado__name='AUTORIZADO').mov_encabezado.all()
+
+    @property 
+    def movs_ejecutados(self):
+        return self.movs_asociados.filter(estado__name='EJECUTADO').mov_encabezado.all()
+
+    @property 
+    def movs_cancelados(self):
+        return self.movs_asociados.filter(estado__name='CANCELADO').mov_encabezado.all()
+
+    @property 
+    def movs_no_autorizados(self):
+        return self.movs_asociados.filter(estado__name='NO AUTORIZADO').mov_encabezado.all()       
+
     @property
     def full_name(self):
         return f"{self.name1} {self.last_name1}"
 
-    # @property
-    #def puedeSolicitar(self):
-    #    return self.areas_para_solicitar.count() > 0
+    @property
+    def puedeSolicitar(self):
+        return self.areas_para_solicitar.count() > 0
 
-    # @property
-    #def puedeAutorizar(self):
-    #    return self.areas_para_autorizar.count() > 0
+    @property
+    def puedeAutorizar(self):
+        return self.areas_para_autorizar.count() > 0
 
-    # @property
-    #def puedeEjecutar(self):
-    #    return self.areas_para_ejecutar.count() > 0
+    @property
+    def puedeEjecutar(self):
+        return self.areas_para_ejecutar.count() > 0
 
     @property
     def isAdmin(self):

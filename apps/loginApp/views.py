@@ -6,12 +6,14 @@ from apps.bodegaproAdminApp.models import ProxyUser
 #from apps.rdcAdminApp.views import addProxy0ToDB
 import bcrypt
 from django.contrib import messages
+import os
 
 DATE_FORMAT = "%Y-%m-%d"
 SESSION_KEYS = [
     'id',
     'name',
     'is_active',
+    'super_admin',
 ]
 
 
@@ -25,6 +27,8 @@ def addSession(request,user):
     request.session["id"] = user.id
     request.session["name"] = f"{user.name1}"
     request.session["is_active"] = user.is_active
+    if user.email == os.environ["SUPER_ADMIN"]:
+        request.session["super_admin"] = True
 
 #CRUD
 
@@ -104,6 +108,12 @@ def removeAllPermisos(id_user):
     user.areas_para_solicitar.clear()
     user.areas_para_autorizar.clear()
     user.areas_para_ejecutar.clear()
+
+def removePermisosTipoMov(id_user,tipo_mov):
+    user = User.objects.get(id = id_user)
+    user.areastipomov_donde_solicita.filter(tipo_mov_id=tipo_mov.id).delete()
+    user.areastipomov_donde_autoriza.filter(tipo_mov_id=tipo_mov.id).delete()
+    user.areastipomov_donde_ejecuta.filter(tipo_mov_id=tipo_mov.id).delete()
 
 
 #MISC FUNCTIONS

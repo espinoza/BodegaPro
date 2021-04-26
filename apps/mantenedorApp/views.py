@@ -8,12 +8,15 @@ from django.contrib import messages
 
 TABLAS = {
     'area' : 'AREA',
-    'tipo_mov' : 'TIPO MOVIMIENTO',
-    'estado_mov' : 'ESTADO MOV',
     'familia' : 'FAMILIA',
     'unidad_medida' : 'UNIDAD MEDIDA',
     #'folio' : 'FOLIO',
     #'tipo_medida' : 'TIPO MEDIDA
+}
+
+TABLAS_SUPER_ADMIN = {
+    'tipo_mov' : 'TIPO MOVIMIENTO',
+    'estado_mov' : 'ESTADO MOV',
 }
 
 #CRUD
@@ -67,13 +70,18 @@ def gotoMantenedor(request,tabla_name):
 
     user = User.objects.get(id = request.session['id'])
 
+    tablas = {}
+    tablas.update(TABLAS)
+    if "super_admin" in request.session and request.session["super_admin"]:
+        tablas.update(TABLAS_SUPER_ADMIN)
+
     context = {
         'user' : user,
-        'tablas' : TABLAS,
+        'tablas' : tablas,
         'tabla_name' : tabla_name,
         'tabla_data' : Area.objects.all(), #por elegir una tabla por defecto
     }
-
+    
     return render(request, "mantenedor.html", context)
 
 def loadTabla(request): #AJAX
