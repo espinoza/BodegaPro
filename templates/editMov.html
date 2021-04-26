@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+{% if mov_encabezado %}
+<p>{{mov_encabezado.tipo_mov.name}}</p>
+<p>folio: {{mov_encabezado.folio}}</p>
+{% endif %}
+<div>
+    <form method="POST">
+        {% csrf_token %}
+        {{form}}
+        <input class="btn btn-success" type="submit" value="{{button_txt}}">
+    </form>
+</div>
+
+{% if mov_encabezado %}
+    <p>{{mov_encabezado.estado}}</p>
+{% endif %}
+
+{% endblock %}
