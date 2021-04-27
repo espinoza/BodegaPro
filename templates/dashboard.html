@@ -80,8 +80,9 @@
                             <td scope="col-1"><a class="btn btn-sm btn-secondary" href="/pdf">PDF</a></td>
                             <td scope="col-1">{{encabezado.id}}</td>
                             <td scope="col-1">{%if encabezado.tipo_mov.name == 'ENTRADA'%} E {%elif encabezado.tipo_mov.name == 'SALIDA'%} S {%endif%}</td>
+                            <td scope="col-1">{{encabezado.area.name}}</td>
                             <td scope="col-1">
-                                <a href="">00000{{encabezado.folio}}</a>
+                                <a href="">{{encabezado.folio}}</a>
                             </td>
                             <td scope="col-1">{{encabezado.descripcion}}</td> 
                             {%if encabezado.estado == "SOLICITADO"%}                        
@@ -147,8 +148,9 @@
                             <td scope="col-1"><a class="btn btn-sm btn-secondary" href="/pdf">PDF</a></td>
                             <td scope="col-1">{{encabezado.id}}</td>
                             <td scope="col-1">{%if encabezado.tipo_mov.name == 'ENTRADA'%} E {%elif encabezado.tipo_mov.name == 'SALIDA'%} S {%endif%}</td>
+                            <td scope="col-1">{{encabezado.area.name}}</td>
                             <td scope="col-1">
-                                <a href="">00000{{encabezado.folio}}</a>
+                                <a href="">{{encabezado.folio}}</a>
                             </td>
                             <td scope="col-1">{{encabezado.descripcion}}</td> 
                             {%if encabezado.estado == "SOLICITADO"%}                        

@@ -9,8 +9,8 @@ from django.contrib import messages
 def gotoDashboard(request,id_user,tipo):
     if "id" in request.session:
         all_encabezados=MovEncabezado.objects.all()    
-        all_areas=Area.objects.all()
-        all_movimientos=TipoMov.objects.all()
+        all_areas=Area.objects.filter(is_active = True).order_by('pos')
+        all_movimientos=TipoMov.objects.filter(is_active = True).order_by('pos')
         if len(User.objects.filter(id=id_user))>0:
             this_user= User.objects.get(id=id_user)
         else:
