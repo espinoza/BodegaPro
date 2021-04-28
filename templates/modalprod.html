@@ -1,0 +1,62 @@
+<!--MODAL-->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalLabel">...</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="" id="form-modal" enctype="multipart/form-data" method="POST">
+        {% csrf_token %}
+        <div class="modal-body row">
+            <div class="mb-3 col-sm-3">
+                <label for="modal-cod" class="col-form-label">Código</label>
+                <input type="text" class="form-control" id="modal-cod" name="cod">
+            </div>
+            <div class="mb-3 col-sm-9">
+                <label for="modal-name" class="col-form-label">Descripción</label>
+                <input type="text" class="form-control" id="modal-name" name="name">
+            </div>
+        </div>
+        <div class="modal-body row">
+          <div class="col-sm-4 mb-3">
+            <label for="modal-unidad_medida">Unidad</label>
+            <select class="form-select" name="unidad_medida" id="modal-unidad_medida">
+                <option value="0" disabled>Unidad...</option>
+                {% for unidad in unidades %}
+                <option value="{{ unidad.id }}">{{ unidad.name }}</option>
+                {% endfor %}
+            </select>
+          </div>
+          <div class="col-sm-8 mb-3">
+            <label for="modal-familia">Familia</label>
+            <select class="form-select" name="familia" id="modal-familia">
+                <option value="0" disabled>Familia...</option>
+                {% for familia in familias %}
+                <option value="{{ familia.id }}">{{ familia.name }}</option>
+                {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-body row">
+            <div class="col-3" style="text-align: center;">
+                <img id="modal-img_src" class="avatar" src="{{ media_url }}00000000.png" alt="Prod Img">
+            </div>
+            <div class="col-9 form-floating mb-3">
+                <input class="form-control-file" type="file" 
+                    id="modal-image_url" name="img_url" style="margin-top: 20px;">
+            </div>
+        </div>
+
+        <input type="hidden" value="" id="modal-id-to-edit" name="id">
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="modal-edit-btn">Guardar</button>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+<!--FIN MODAL-->
