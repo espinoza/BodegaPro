@@ -17,7 +17,11 @@
 
 {% block content %}
 
-<h3>Maestro de Productos</h3>
+<div class="row">
+<h3 class="col-9">Maestro de Productos</h3>
+<a href="{% url 'generar_pdf_stock' %}" class="col-1 btn btn-outline-secondary" style="margin-right: 20px;">PDF</a>
+<a href="{% url 'generar_pdf_sin_stock' %}" class="col-1 btn btn-outline-secondary">PDF S/Stock</a>
+</div>
 
 {% if messages %}
 <ul class="messages">    

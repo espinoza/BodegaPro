@@ -196,7 +196,7 @@ function getFilaHtml(id_item,producto,tipo){
     <td scope="col">${producto['cantidad']}</td>
     <td scope="col" id="unidad_medida-${id_item}">${producto['unidad_medida']}</td>
     <td scope="col" id="familia-${id_item}">${producto['familia']}</td>
-    <td scope="col">${producto['precio_unit']}</td>`;
+    <td scope="col">${Math.round(producto['precio_unit'])}</td>`;
 
     if (tipo=='edit'){
 

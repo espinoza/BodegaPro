@@ -25,4 +25,8 @@ urlpatterns = [
          views.cambiarEstado, name='change_status'),
     path('PDF/<int:id_mov_encabezado>/',
          views.sacarPDF, name='generar_pdf'),
+    path('PDF/stock/',
+         views.sacarPDFstock, name='generar_pdf_stock'),
+    path('PDF/SinStock/',
+         views.sacarPDFSinstock, name='generar_pdf_sin_stock'),
 ]
