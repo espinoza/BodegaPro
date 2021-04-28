@@ -13,22 +13,24 @@ def gotoDashboard(request,id_user,tipo):
         all_encabezados=MovEncabezado.objects.all()    
         all_areas=Area.objects.filter(is_active = True).order_by('pos')
         all_movimientos=TipoMov.objects.filter(is_active = True).order_by('pos')
+        print(id_user)
         if len(User.objects.filter(id=id_user))>0:
             this_user= User.objects.get(id=id_user)
         else:
             this_user= User.objects.get(id=request.session["id"])
-        mis_movimientos=[]
+        print(this_user)
+        mis_encabezados=[]
         for estado_mov in this_user.movs_asociados.all():
-            mis_movimientos.append(estado_mov.mov_encabezado)
-        print(mis_movimientos)
+            if estado_mov.mov_encabezado not in mis_encabezados:
+                mis_encabezados.append(estado_mov.mov_encabezado)        
         context = {
             'id_user' : id_user,
             'tipo' : tipo,
-            'user' : User.objects.get(id = request.session['id']),
+            'user' : this_user,
             'all_encabezados':all_encabezados,
             'all_areas':all_areas,
             'all_movimientos':all_movimientos,
-            'mis_movimientos':mis_movimientos,            
+            'mis_encabezados':mis_encabezados,            
         }
         return render(request,'dashboard.html',context)
     return redirect("/")
