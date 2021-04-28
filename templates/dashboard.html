@@ -78,7 +78,7 @@
                         {% if tipo == "activemov" %}
                         {% if encabezado.estado != "CANCELADO" and encabezado.estado != "NO APROBADO" and encabezado.estado != "NO AUTORIZADO"  and encabezado.estado != "EJECUTADO"%}                       
                         <tr class="bg-light">
-                            <td scope="col-1"><a class="btn btn-sm btn-secondary" href="/pdf">PDF</a></td>
+                            <td scope="col-1"><a class="btn btn-sm btn-secondary" href="/movs/PDF/{{encabezado.id}}">PDF</a></td>
                             <td scope="col-1">{{encabezado.id}}</td>                            
                             <td scope="col-1">{%if encabezado.tipo_mov.name == 'ENTRADA'%} E {%elif encabezado.tipo_mov.name == 'SALIDA'%} S {%endif%}</td>
                             <td scope="col-1">{{encabezado.area.name}}</td>
@@ -163,7 +163,7 @@
                         {%endif%}
                         {% if tipo != "activemov" %}                     
                         <tr>
-                            <td scope="col-1"><a class="btn btn-sm btn-secondary" href="/pdf">PDF</a></td>
+                            <td scope="col-1"><a class="btn btn-sm btn-secondary" href="/movs/PDF/{{encabezado.id}}">PDF</a></td>
                             <td scope="col-1">{{encabezado.id}}</td>
                             <td scope="col-1">{%if encabezado.tipo_mov.name == 'ENTRADA'%} E {%elif encabezado.tipo_mov.name == 'SALIDA'%} S {%endif%}</td>
                             <td scope="col-1">{{encabezado.area.name}}</td>
@@ -252,7 +252,7 @@
                         {% if tipo == "activemov" %}
                         {% if encabezado.estado != "CANCELADO" and encabezado.estado != "NO APROBADO" and encabezado.estado != "NO AUTORIZADO"  and encabezado.estado != "EJECUTADO"%}                       
                         <tr class="bg-light">
-                            <td scope="col-1"><a class="btn btn-sm btn-secondary" href="/pdf">PDF</a></td>
+                            <td scope="col-1"><a class="btn btn-sm btn-secondary" href="/movs/PDF/{{encabezado.id}}">PDF</a></td>
                             <td scope="col-1">{{encabezado.id}}</td>                            
                             <td scope="col-1">{%if encabezado.tipo_mov.name == 'ENTRADA'%} E {%elif encabezado.tipo_mov.name == 'SALIDA'%} S {%endif%}</td>
                             <td scope="col-1">{{encabezado.area.name}}</td>
@@ -337,7 +337,7 @@
                         {%endif%}
                         {% if tipo != "activemov" %}                     
                         <tr>
-                            <td scope="col-1"><a class="btn btn-sm btn-secondary" href="/pdf">PDF</a></td>
+                            <td scope="col-1"><a class="btn btn-sm btn-secondary" href="/movs/PDF/{{encabezado.id}}">PDF</a></td>
                             <td scope="col-1">{{encabezado.id}}</td>
                             <td scope="col-1">{%if encabezado.tipo_mov.name == 'ENTRADA'%} E {%elif encabezado.tipo_mov.name == 'SALIDA'%} S {%endif%}</td>
                             <td scope="col-1">{{encabezado.area.name}}</td>
