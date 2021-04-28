@@ -37,7 +37,7 @@
 {% elif mov_encabezado.estado == 'AUTORIZADO' and user_ejecutando %}
     <form  method = 'POST' action="{% url 'change_status' mov_encabezado.id %}">
         {% csrf_token %}  
-        <input type="hidden" name="new_status" value="EJECUTAR">
+        <input type="hidden" name="new_status" value="EJECUTADO">
         <input type="hidden" name="id_mov" value="{{mov_encabezado.id}}">
         <button class=" btn btn-success h-red mg-auto" id="btn-add-item"><i class="far fa-check-circle"></i> EJECUTAR </button>
     </form>    
@@ -127,7 +127,7 @@
             <th scope="col" style="width:40%">Descripción</th>
             <th scope="col" style="width:8%">Cant. Solicitada</th>
             <th scope="col" style="width:8%">Un</th>
-            {%if mov_encabezado.estado == "SOLICITADO"%}
+            {%if mov_encabezado.estado == "SOLICITADO" or mov_encabezado.estado == "AUTORIZADO" %}
                 <th scope="col" style="width:8%">Cant. Autorizada</th>
             {%endif%}
             {%if mov_encabezado.estado == "AUTORIZADO"%}
@@ -150,7 +150,7 @@
             <td scope="col">{{ mov_item.producto.name }}</td>
             <td scope="col">{{ mov_item.cant_solicitada}}</td>
             <td scope="col">{{ mov_item.producto.unidad_medida.name }}</td>
-            {%if mov_encabezado.estado == "SOLICITADO"%}
+            {%if mov_encabezado.estado == "SOLICITADO" or mov_encabezado.estado == "AUTORIZADO" %}
                 <td scope="col">{% if mov_item.cant_autorizada == None %} 0 {%else%} {{ mov_item.cant_autorizada }} {%endif%}</td>
             {%endif%}
             {%if mov_encabezado.estado == "AUTORIZADO"%}
@@ -163,7 +163,8 @@
                 <form class="form-inline"  method='POST' action="{% url 'edit_item' mov_encabezado.id %}">
                     {% csrf_token %}
                     <input type="hidden" name="id_item" value="{{mov_item.id}}">
-                    <input class="col-2" type="number" name="quantity" min="0" value={{mov_item.cant_solicitada}}>
+                    <input class="col-2" type="number" name="quantity" min="0"
+                           value="{% if user_solicitando %}{{mov_item.cant_solicitada}}{% elif user_autorizando %}{{mov_item.cant_autorizada}}{% elif user_ejecutando %}{{mov_item.cant_ejecutada}}{% endif %}">
                     <button class="col-2 btn btn-primary h-red mg-auto" id="btn-add-item"><i class="fas fa-edit"></i></button>
                 </form>
             </td>

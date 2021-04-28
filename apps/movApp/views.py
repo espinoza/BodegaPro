@@ -133,7 +133,7 @@ def gotoMov(request, id_mov_encabezado):
         return redirect("/")
     mov_encabezado = mov_encabezado[0]
 
-    if mov_encabezado.estado == "CREADO":
+    if mov_encabezado.estado in ["CREADO", "CANCELADO"]:
         return redirect("/movs/solicitud/" + str(mov_encabezado.id))
 
     if mov_encabezado.estado == "SOLICITADO":
@@ -153,7 +153,18 @@ def gotoMov(request, id_mov_encabezado):
 
 
     if mov_encabezado.estado == "AUTORIZADO":
-        # TODO: Esto debería redirigir a ejecución
+        areas_para_ejecutar = logged_user.areas_para_ejecutar.all()
+        tipos_para_ejecutar = logged_user.tipos_para_ejecutar.all()
+        if (mov_encabezado.area in areas_para_ejecutar
+                and mov_encabezado.tipo_mov in tipos_para_ejecutar) or (logged_user.isAdmin):
+            return redirect("/movs/ejecucion/" + str(mov_encabezado.id))
+        areas_para_ver = logged_user.areas_para_solicitar.all() \
+                  .union(logged_user.areas_para_autorizar.all())
+        tipos_para_ver = logged_user.tipos_para_solicitar.all() \
+                  .union(logged_user.tipos_para_autorizar.all())
+        if (mov_encabezado.area in areas_para_ver
+                and mov_encabezado.tipo_mov in tipos_para_ver) or (logged_user.isAdmin):
+            return redirect("/movs/ejecucion/" + str(mov_encabezado.id))
         return redirect("/")
     
 
@@ -175,7 +186,6 @@ def solicitud(request, id_mov_encabezado):
 
     producto_form = AddProductoToMovForm()
     context = {} 
-    print("////////////////////////////////")
 
     if request.method == "POST":
 
@@ -220,6 +230,8 @@ def solicitud(request, id_mov_encabezado):
     context["mov_encabezado"] = mov_encabezado
 
     context["user_solicitando"] = False
+    context["user_autorizando"] = False
+    context["user_ejecutando"] = False
     if mov_encabezado.estado == "CREADO":
         mov_estado_creado = mov_encabezado.mov_estados \
                             .get(estado__name="CREADO")
@@ -230,7 +242,69 @@ def solicitud(request, id_mov_encabezado):
   
 
 def autorizacion(request, id_mov_encabezado):
-    return HttpResponse("acá va la autorización")
+    if "id" not in request.session:
+        return redirect("/")
+    user = User.objects.filter(id=request.session["id"])
+    if not user:
+        return redirect("/")
+    logged_user = user[0]
+
+    mov_encabezado = MovEncabezado.objects.filter(id=id_mov_encabezado)
+    if not mov_encabezado:
+        return redirect("/")
+    mov_encabezado = mov_encabezado[0]
+
+    if mov_encabezado.estado not in ["SOLICITADO", "NO AUTORIZADO"]:
+        return redirect("/")
+
+    context = {} 
+
+    context["mov_encabezado"] = mov_encabezado
+
+    context["user_solicitando"] = False
+    context["user_autorizando"] = False
+    context["user_ejecutando"] = False
+    if mov_encabezado.estado == "SOLICITADO":
+        areas_para_autorizar = logged_user.areas_para_autorizar.all()
+        tipos_para_autorizar = logged_user.tipos_para_autorizar.all()
+        if (mov_encabezado.area in areas_para_autorizar
+                and mov_encabezado.tipo_mov in tipos_para_autorizar) or (logged_user.isAdmin):
+            context["user_autorizando"] = True
+
+    return render(request, "editMov.html", context)
+
+
+def ejecucion(request, id_mov_encabezado):
+    if "id" not in request.session:
+        return redirect("/")
+    user = User.objects.filter(id=request.session["id"])
+    if not user:
+        return redirect("/")
+    logged_user = user[0]
+
+    mov_encabezado = MovEncabezado.objects.filter(id=id_mov_encabezado)
+    if not mov_encabezado:
+        return redirect("/")
+    mov_encabezado = mov_encabezado[0]
+
+    if mov_encabezado.estado != "AUTORIZADO":
+        return redirect("/")
+
+    context = {} 
+
+    context["mov_encabezado"] = mov_encabezado
+
+    context["user_solicitando"] = False
+    context["user_autorizando"] = False
+    context["user_ejecutando"] = False
+    if mov_encabezado.estado == "AUTORIZADO":
+        areas_para_ejecutar = logged_user.areas_para_ejecutar.all()
+        tipos_para_ejecutar = logged_user.tipos_para_ejecutar.all()
+        if (mov_encabezado.area in areas_para_ejecutar
+                and mov_encabezado.tipo_mov in tipos_para_ejecutar) or (logged_user.isAdmin):
+            context["user_ejecutando"] = True
+
+    return render(request, "editMov.html", context)
 
 
 def eliminarItem(request, id_mov_encabezado):
@@ -243,12 +317,12 @@ def eliminarItem(request, id_mov_encabezado):
     if not user:
         return redirect("/")
 
-    try:
-        item = MovItem.objects.get(id=request.POST["id_item"])
-        item.delete()
-        return redirect(f"/movs/view/{id_mov_encabezado}")
-    except:
-        pass
+    item = MovItem.objects.filter(id=request.POST["id_item"])
+    if not item:
+        return redirect("/")
+    item = item[0]
+    item.delete()
+    return redirect(f"/movs/view/{id_mov_encabezado}")
 
 
 def editarItem(request, id_mov_encabezado):
@@ -260,16 +334,31 @@ def editarItem(request, id_mov_encabezado):
     user = User.objects.filter(id=request.session["id"])
     if not user:
         return redirect("/")
+    logged_user = user[0]
 
-    try:
-        item = MovItem.objects.get(id=request.POST["id_item"])
-        print(item.producto.name)
+    mov_encabezado = MovEncabezado.objects.filter(id=id_mov_encabezado)
+    if not mov_encabezado:
+        return redirect("/")
+    mov_encabezado = mov_encabezado[0]
+
+    item = MovItem.objects.filter(id=request.POST["id_item"])
+    if not item:
+        return redirect("/")
+    item = item[0]
+
+    print(item.producto.name)
+    if mov_encabezado.estado == "CREADO":
         item.cant_solicitada = request.POST["quantity"]
         print(item.cant_solicitada)
-        item.save()
-        return redirect(f"/movs/view/{id_mov_encabezado}")
-    except:
-        return redirect(f"/movs/view/{id_mov_encabezado}")
+    elif mov_encabezado.estado == "SOLICITADO":
+        item.cant_autorizada = request.POST["quantity"]
+        print(item.cant_autorizada)
+    elif mov_encabezado.estado == "AUTORIZADO":
+        item.cant_ejecutada = request.POST["quantity"]
+        print(item.cant_ejecutada)
+    item.save()
+
+    return redirect(f"/movs/view/{id_mov_encabezado}")
 
 
 def cambiarEstado(request, id_mov_encabezado):
@@ -282,6 +371,11 @@ def cambiarEstado(request, id_mov_encabezado):
     if not user:
         return redirect("/")
     logged_user = user[0]
+    mov_encabezado = MovEncabezado.objects.filter(id=id_mov_encabezado)
+    if not mov_encabezado:
+        return redirect("/")
+    mov_encabezado = mov_encabezado[0]
+
     try:
         new_estado = Estado.objects.get(name=request.POST['new_status'])
         mov = MovEncabezado.objects.get(id=id_mov_encabezado)
@@ -294,7 +388,12 @@ def cambiarEstado(request, id_mov_encabezado):
 
         if new_estado.name == "SOLICITADO":
             for mov_item in mov.mov_items.all():
-                mov_item.cantidad_autorizada = mov_item.cantidad_solicitada
+                mov_item.cant_autorizada = mov_item.cant_solicitada
+                mov_item.save()
+
+        if new_estado.name == "AUTORIZADO":
+            for mov_item in mov.mov_items.all():
+                mov_item.cant_ejecutada = mov_item.cant_autorizada
                 mov_item.save()
 
         return redirect('/movs/0/activemov')
