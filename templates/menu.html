@@ -22,18 +22,6 @@
           </li>
           {% if goBack == 'users' %}
           <li class="nav-item mg-auto"><a class="nav-link active" aria-current="page" href="{% url 'usuarios' %}">Panel de Usuarios</a></li>
-          {% elif goBack == '' %}
-          {# nada #}
-          {% else %}
-            {% if user.puedeAutorizar or user.puedeEjecutar or user.isAdmin %}
-            <li class="nav-item mg-auto">
-              <a class="nav-link active" aria-current="page" href="{% url 'dashboard' id_user='0' tipo='activemov' %}">Movimientos</a>
-            </li>
-            {% elif user.puedeSolicitar or user.isAdmin %}
-            <li class="nav-item mg-auto">
-              <a class="nav-link active" aria-current="page" href="{% url 'dashboard' id_user=request.session.id tipo='activemov' %}">Movimientos</a>
-            </li>
-            {% endif %}
           {% endif %}
         </ul>
         <div class="nav-item dropdown mg-auto">

@@ -1,43 +1,138 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block extraStyles %}
+<script src="https://kit.fontawesome.com/dea7dee501.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'css/stylesMantenedor.css' %}"/> 
+{% endblock %}
+
+{% block extraScripts %}
+<script src="{% static 'js/functionsProductos.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 
-{% if mov_encabezado %}
-<p>{{mov_encabezado.tipo_mov.name}}</p>
-<p>folio: {{mov_encabezado.folio}}</p>
-{% endif %}
-<div>
-    <form method="POST">
-        {% csrf_token %}
-        {{encabezado_form}}
-        <input class="btn btn-success" type="submit" value="{{button_txt}}">
+<h3>Movimiento de {{mov_encabezado.tipo_mov.name}} - Estado {{mov_encabezado.estado}}</h3>
+
+{% if mov_encabezado.estado == 'CREADO' %}
+    <form  method = 'POST' action="cambiarEstado">
+        {% csrf_token %}  
+        <input type="hidden" name="action" value="SOLICITADO">
+        <input type="hidden" name="id_mov" value={{mov_encabezado.id}}">
+        <button class=" btn btn-warning h-red mg-auto" id="btn-add-item"><i class="far fa-angle-double-up"></i> Solicitar </button>
     </form>
-</div>
-
+{% elif mov_encabezado.estado == 'SOLICITADO'%}
+    <form  method = 'POST' action="cambiarEstado">
+        {% csrf_token %}  
+        <input type="hidden" name="action" value="AUTORIZADO">
+        <input type="hidden" name="id_mov" value={{mov_encabezado.id}}">
+        <button class=" btn btn-success h-red mg-auto" id="btn-add-item"><i class="far fa-check-circle"></i> AUTORIZAR </button>
+    </form>    
+{%endif%}
 {% if mov_encabezado %}
-    <p>{{mov_encabezado.estado}}</p>
 
-    {% if producto_form %}
-        <form method="POST">
-            {% csrf_token %}
-            {{ producto_form }}
-            <input type="submit" value="+">
-        </form>
-        {% if posibles_productos %}
-            <p>Existe más de un producto con ese nombre:</p>
-            <ul>
-            {% for producto in posibles_productos.all %}
-                <li>{{producto.cod}} {{producto.name}}</li>
-            {% endfor %}
-            </ul>
-        {% endif %}
-    {% endif %}
-
-    {% for mov_item in mov_encabezado.mov_items.all %}
-        <p>{{ mov_item.producto.name }}</p>
+<h2>Folio n°: {{mov_encabezado.folio}}</h2>
+{% endif %}
+<div class="row mb-5">
+    <div class="col">
+        <div class="card card-default" >
+            <div class="card-header">
+                <h3>Actualizar movimiento</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    {{encabezado_form}}
+                    <input class="btn btn-success" type="submit" value="{{button_txt}}">
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        {% if mov_encabezado %}
+            
+            <div class="card card-default" >
+                <div class="card-header">
+                <h3>Agrege un producto</h3>
+                </div>
+                <div class="card-body">
+                {% if producto_form %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{ producto_form}}
+                        <input class="btn btn-primary" type="submit" value="+">
+                    </form>
+                    {% if posibles_productos %}
+                        <p>Existe más de un producto con ese nombre:</p>
+                        <ul>
+                        {% for producto in posibles_productos.all %}
+                            <li>{{producto.cod}} {{producto.name}}</li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endif %}
+                </div>
+            </div>
+    </div>
+</div>
+    <table class="table table-striped align-text-top">
+      <thead>
+        <tr>
+          <th scope="col"></th>
+          <th scope="col">Cod</th>
+          <th scope="col" style="width:40%">Descripción</th>
+          <th scope="col" style="width:8%">Cant. Solicitada</th>
+          <th scope="col" style="width:8%">Un</th>
+          {%if mov_encabezado.estado == "SOLICITADO"%}
+            <th scope="col" style="width:8%">Cant. Autorizada</th>
+          {%endif%}
+          {%if mov_encabezado.estado == "AUTORIZADO"%}
+            <th scope="col" style="width:8%">Cant. Concretada</th>
+          {%endif%}
+          <th scope="col" style="width:8%">$ Unit</th>
+          <th scope="col">Editar</th>
+          <th scope="col">Eliminar</th>
+          
+        </tr>
+    </thead>
+     {% for mov_item in mov_encabezado.mov_items.all %}
+        <tr id="tr-{{ mov_item.producto.id }}">
+            <td scope="col"><img class="avatar" src="/media/{{ mov_item.producto.img_url }}" alt="Prod Img"></td>
+            <td scope="col">{{ mov_item.producto.cod }}</td>
+            <td scope="col">{{ mov_item.producto.name }}</td>
+            <td scope="col">{{ mov_item.cant_solicitada}}</td>
+            <td scope="col">{{ mov_item.producto.unidad_medida.name }}</td>
+            {%if mov_encabezado.estado == "SOLICITADO"%}
+                <td scope="col">{% if mov_item.cant_autorizada == None %} 0 {%else%} {{ mov_item.cant_autorizada }} {%endif%}</td>
+            {%endif%}
+            {%if mov_encabezado.estado == "AUTORIZADO"%}
+                <td scope="col">{% if mov_item.cant_ejecutada == None %} 0 {%else%} {{ mov_item.cant_ejecutada }} {%endif%}</td>
+            {%endif%}
+            <td scope="col">{% if mov_item.precio_unit == None %} 0 {%else%} {{ mov_item.precio_unit }} {%endif%}</td>
+            <td scope="col">
+            <form class="form-inline"  method='POST' action="editarItem">
+                {% csrf_token %}
+                    <input type="hidden" name="id_item" value="{{mov_item.id}}">
+                    <input class="col-2" type="number" name="quantity" min="0" value={{mov_item.cant_solicitada}}>
+                    <button class="col-2 btn btn-primary h-red mg-auto" id="btn-add-item"><i class="fas fa-edit"></i></button>
+            </form>
+            
+            </td>
+            <td scope="col">
+            <form  method = 'POST' action="eliminarItem">
+                {% csrf_token %}  
+                <input type="hidden" name="id_item" value="{{mov_item.id}}">
+                <input type="hidden" name="id_mov" value={{mov_encabezado.id}}">
+                <button class=" btn btn-danger h-red mg-auto" id="btn-add-item"><i class="fas fa-trash-alt"></i> </button>
+            </form>
+            </td>
+        </tr>
     {% empty %}
-        <p>No hay productos en la lista</p>
+    <tr>
+        <td></td>
+        <td><p>No hay productos en la lista</p></td>
+    </tr>
+        
     {% endfor %}
 
 {% endif %}

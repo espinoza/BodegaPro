@@ -10,32 +10,33 @@ from .forms import NewMovEncabezadoForm, EditMovEncabezadoForm, \
 from django.contrib import messages
 
 
-def gotoDashboard(request,id_user,tipo):
+def gotoDashboard(request, id_user, tipo):
     if "id" in request.session:
-        all_encabezados=MovEncabezado.objects.all()    
-        all_areas=Area.objects.filter(is_active = True).order_by('pos')
-        all_movimientos=TipoMov.objects.filter(is_active = True).order_by('pos')
+        all_encabezados = MovEncabezado.objects.all()
+        all_areas = Area.objects.filter(is_active=True).order_by('pos')
+        all_movimientos = TipoMov.objects.filter(
+            is_active=True).order_by('pos')
         print(id_user)
 
-        if len(User.objects.filter(id=id_user))>0:
-            this_user= User.objects.get(id=id_user)
+        if len(User.objects.filter(id=id_user)) > 0:
+            this_user = User.objects.get(id=id_user)
         else:
-            this_user= User.objects.get(id=request.session["id"])
+            this_user = User.objects.get(id=request.session["id"])
         print(this_user)
-        mis_encabezados=[]
+        mis_encabezados = []
         for estado_mov in this_user.movs_asociados.all():
             if estado_mov.mov_encabezado not in mis_encabezados:
-                mis_encabezados.append(estado_mov.mov_encabezado)        
+                mis_encabezados.append(estado_mov.mov_encabezado)
         context = {
-            'id_user' : id_user,
-            'tipo' : tipo,
-            'user' : this_user,
-            'all_encabezados':all_encabezados,
-            'all_areas':all_areas,
-            'all_movimientos':all_movimientos,
-            'mis_encabezados':mis_encabezados,            
+            'id_user': id_user,
+            'tipo': tipo,
+            'user': this_user,
+            'all_encabezados': all_encabezados,
+            'all_areas': all_areas,
+            'all_movimientos': all_movimientos,
+            'mis_encabezados': mis_encabezados,
         }
-        return render(request,'dashboard.html',context)
+        return render(request, 'dashboard.html', context)
     return redirect("/")
 
 
@@ -73,7 +74,7 @@ def createNewMov(request):
         if tipo_mov_id:
             initial_data["tipo_mov"] = tipo_mov[0]
         form = NewMovEncabezadoForm(initial=initial_data)
-        
+
     if request.method == "POST":
         form = NewMovEncabezadoForm(request.POST)
         if form.is_valid():
@@ -104,7 +105,7 @@ def createNewMov(request):
             new_mov_estado.save()
 
             return redirect("/movs/view/" + str(new_mov_encabezado.id))
-    
+
     context = {
         "encabezado_form": form,
         "button_txt": "Crear"
@@ -255,3 +256,58 @@ def solicitar_cancelar(request, id_mov_encabezado):
                 mov_item.save()
 
     return redirect("/movs/" + str(logged_user.id) + "/activemov")
+
+
+def eliminarItem(request, id_mov_encabezado):
+    if "id" not in request.session:
+        return redirect("/")
+    user = User.objects.filter(id=request.session["id"])
+    if not user:
+        return redirect("/")
+
+    try:
+        item = MovItem.objects.get(id=request.POST["id_item"])
+        item.delete()
+        return redirect(f"/movs/view/{id_mov_encabezado}")
+    except:
+        pass
+
+
+def editarItem(request, id_mov_encabezado):
+    if "id" not in request.session:
+        return redirect("/")
+    user = User.objects.filter(id=request.session["id"])
+    if not user:
+        return redirect("/")
+
+    try:
+        item = MovItem.objects.get(id=request.POST["id_item"])
+        print(item.producto.name)
+        item.cant_solicitada = request.POST["quantity"]
+        print(item.cant_solicitada)
+        item.save()
+        return redirect(f"/movs/view/{id_mov_encabezado}")
+    except:
+        return redirect(f"/movs/view/{id_mov_encabezado}")
+
+
+def cambiarEstado(request, id_mov_encabezado):
+    if "id" not in request.session:
+        return redirect("/")
+    user = User.objects.filter(id=request.session["id"])
+    if not user:
+        return redirect("/")
+    logged_user = user[0]
+    try:
+        estado = Estado.objects.get(name=request.POST['action'])
+        mov = MovEncabezado.objects.get(id=id_mov_encabezado)
+        new_mov_estado = MovEstado()
+        new_mov_estado.mov_encabezado = mov
+        new_mov_estado.estado = estado
+        new_mov_estado.user = logged_user
+        new_mov_estado.nota = ""
+        new_mov_estado.save()
+
+        return redirect('dashboard')
+    except:
+        return redirect(f"/movs/view/{id_mov_encabezado}")
