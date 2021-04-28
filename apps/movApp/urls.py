@@ -15,4 +15,6 @@ urlpatterns = [
          views.editarItem, name='edit_item'),
     path('view/<int:id_mov_encabezado>/cambiarEstado',
          views.cambiarEstado, name='change_status'),
+    path('PDF/<int:id_mov_encabezado>/',
+         views.sacarPDF, name='generar_pdf'),
 ]
