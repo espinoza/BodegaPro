@@ -134,8 +134,20 @@ def gotoMov(request, id_mov_encabezado):
         return redirect("/movs/solicitud/" + str(mov_encabezado.id))
 
     if mov_encabezado.estado == "SOLICITADO":
-        # TODO: Esto debería redirigir a autorización
+        areas_para_autorizar = logged_user.areas_para_autorizar.all()
+        tipos_para_autorizar = logged_user.tipos_para_autorizar.all()
+        if (mov_encabezado.area in areas_para_autorizar
+                and mov_encabezado.tipo_mov in tipos_para_autorizar):
+            return redirect("/movs/autorizacion/" + str(mov_encabezado.id))
+        areas_para_ver = logged_user.areas_para_solicitar.all() \
+                  .union(logged_user.areas_para_ejecutar.all())
+        tipos_para_ver = logged_user.tipos_para_solicitar.all() \
+                  .union(logged_user.tipos_para_ejecutar.all())
+        if (mov_encabezado.area in areas_para_ver
+                and mov_encabezado.tipo_mov in tipos_para_ver):
+            return redirect("/movs/solicitud/" + str(mov_encabezado.id))
         return redirect("/")
+
 
     if mov_encabezado.estado == "AUTORIZADO":
         # TODO: Esto debería redirigir a ejecución
@@ -155,11 +167,12 @@ def solicitud(request, id_mov_encabezado):
         return redirect("/")
     mov_encabezado = mov_encabezado[0]
 
-    if mov_encabezado.estado not in ["CREADO", "CANCELADO"]:
+    if mov_encabezado.estado not in ["CREADO", "CANCELADO", "SOLICITADO"]:
         return redirect("/")
 
     producto_form = AddProductoToMovForm()
-    context = {}
+    context = {} 
+    print("////////////////////////////////")
 
     if request.method == "POST":
 
@@ -213,6 +226,10 @@ def solicitud(request, id_mov_encabezado):
 
     return render(request, "editMov.html", context)
   
+
+def autorizacion(request, id_mov_encabezado):
+    return HttpResponse("acá va la autorización")
+
 
 def eliminarItem(request, id_mov_encabezado):
     # NOTE: Falta no permitir que otro usuario modifique el formulario
