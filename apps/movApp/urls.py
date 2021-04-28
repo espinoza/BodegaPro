@@ -17,6 +17,8 @@ urlpatterns = [
          views.solicitud, name='solicitud'),
     path('autorizacion/<int:id_mov_encabezado>/',
          views.autorizacion, name='autorizacion'),
+    path('ejecucion/<int:id_mov_encabezado>/',
+         views.ejecucion, name='ejecucion'),
     path('view/<int:id_mov_encabezado>/eliminarItem',
          views.eliminarItem, name='delete_item'),
     path('view/<int:id_mov_encabezado>/editarItem',
