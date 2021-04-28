@@ -8,13 +8,14 @@
 {% block title %}BodegaPro{% endblock %}
 
 {% block content %}
+{% with id_user=user_dash.id  %}
 <div class="container b" >
     <div class="row">
         <h3 class="col-md-6 col-9">
             {% if id_user == request.session.id %}
             Mis Movimientos 
-            {% elif id_user > 0 %}
-            Movimientos de {{ user.full_name }} 
+            {% elif id_user > 0 %} 
+            Movimientos de {{ user_dash.full_name }}
             {% elif id_user == 0 %}
             Todos los Movimientos
             {% endif %}
@@ -28,6 +29,7 @@
             <a class="col blurred-link" href="{% url 'dashboard' id_user=id_user tipo='activemov' %}">Solo Activas</a>
             {% endif %}
         </h3>
+        {% if id_user == request.session.id %}
         <div class="col">
             <div class="container-fluid">
                 <form class="row" action="{% url 'request_new_mov' %}" method="post">
@@ -51,7 +53,8 @@
                     <input class="col-4 btn btn-primary" type="submit" value="Nuevo">
                 </form>                   
             </div>
-        </div>       
+        </div>
+        {% endif %}
     </div>
 </div>
 <div class="container-fluid p-2">
@@ -427,5 +430,5 @@
         </div> 
 
 
-
+{% endwith %}
 {% endblock %}
