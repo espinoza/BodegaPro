@@ -208,3 +208,34 @@ def solicitud(request, id_mov_encabezado):
 
     return render(request, "editMov.html", context)
   
+
+def solicitar(request, id_mov_encabezado):
+    if "id" not in request.session:
+        return redirect("/")
+    user = User.objects.filter(id=request.session["id"])
+    if not user:
+        return redirect("/")
+    logged_user = user[0]
+
+    mov_encabezado = MovEncabezado.objects.filter(id=id_mov_encabezado)
+    if not mov_encabezado:
+        return redirect("/")
+    mov_encabezado = mov_encabezado[0]
+
+    if mov_encabezado.estado != "CREADO":
+        return redirect("/")
+    mov_estado_creado = mov_encabezado.mov_estados.get(estado__name="CREADO")
+
+    estado = Estado.objects.filter(name="SOLICITADO")
+    if not estado:
+        return redirect("/")
+    estado_solicitado = estado[0]
+    
+    new_mov_estado = MovEstado()
+    new_mov_estado.mov_encabezado = mov_encabezado
+    new_mov_estado.estado = estado_solicitado
+    new_mov_estado.user = logged_user
+    new_mov_estado.nota = mov_estado_creado.nota
+    new_mov_estado.save()
+
+    return redirect("/movs/" + str(logged_user.id) + "/activemov")
