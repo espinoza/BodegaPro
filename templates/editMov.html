@@ -56,7 +56,7 @@
     {% endif %}
     </h3>
     </div>  
-    {% if not user_autorizando %}
+    {% if not user_autorizando  %}
     <h4 class="text-warning" >En espera de autorización</h4>
     {% endif %}
 {% endif %}
@@ -156,7 +156,8 @@
             {%if mov_encabezado.estado == "AUTORIZADO"%}
                 <td scope="col">{% if mov_item.cant_ejecutada == None %} 0 {%else%} {{ mov_item.cant_ejecutada }} {%endif%}</td>
             {%endif%}
-            <td scope="col">{% if mov_item.precio_unit == None %} 0 {%else%} {{ mov_item.precio_unit }} {%endif%}</td>
+            <td scope="col">{{ mov_item.producto.precio_unit }}</td>
+            <!--td scope="col">{% if mov_item.precio_unit == None %} 0 {%else%} {{ mov_item.precio_unit }} {%endif%}</td-->
 
             {% if user_solicitando or user_autorizando or user_ejecutando %}
             <td scope="col">
