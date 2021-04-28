@@ -102,7 +102,7 @@ def createNewMov(request):
             return redirect("/movs/view/" + str(new_mov_encabezado.id))
     
     context = {
-        "form": form,
+        "encabezado_form": form,
         "button_txt": "Crear"
     }
     return render(request, "editMov.html", context)
