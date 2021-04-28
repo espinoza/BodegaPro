@@ -32,7 +32,7 @@ def updateProductoDB(post_data,file_data):
         producto.cod = post_data['cod']
 
     if "name" in post_data:
-        producto.name = post_data['name']
+        producto.name = post_data['name'].upper()
 
     if "unidad_medida" in post_data:
         producto.unidad_medida = \
