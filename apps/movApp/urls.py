@@ -9,5 +9,5 @@ urlpatterns = [
     path('new', views.createNewMov, name='create_new_mov'),
     path('view/<int:id_mov_encabezado>/', views.gotoMov, name='goto_mov'),
     path('solicitud/<int:id_mov_encabezado>/', views.solicitud, name='solicitud'),
-    path('solicitar/<int:id_mov_encabezado>/', views.solicitar, name='solicitar'),
+    path('solicitud_ok/<int:id_mov_encabezado>/', views.solicitar_cancelar, name='solicitud_ok'),
 ]
