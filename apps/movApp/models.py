@@ -140,3 +140,7 @@ class Stock(models.Model):
     producto = models.OneToOneField(Producto,related_name="stock_data",on_delete=models.CASCADE)
     cantidad = models.FloatField(default=0)
     monto_total = models.FloatField(default=0)
+
+    def __str__(self):
+        return f"{self.producto.name} Cant:{self.cantidad} Monto Total ${self.monto_total}"
+

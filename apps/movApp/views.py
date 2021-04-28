@@ -9,6 +9,7 @@ from .forms import NewMovEncabezadoForm, EditMovEncabezadoForm, \
                    AddProductoToMovForm
 from django.contrib import messages
 from .utils import render_to_pdf
+from datetime import datetime
 
 
 def gotoDashboard(request, id_user, tipo):
@@ -266,6 +267,7 @@ def editarItem(request, id_mov_encabezado):
         print(item.producto.name)
         item.cant_solicitada = request.POST["quantity"]
         print(item.cant_solicitada)
+        item.precio_unit = item.producto.precio_unit
         item.save()
         return redirect(f"/movs/view/{id_mov_encabezado}")
     except:
@@ -311,4 +313,33 @@ def sacarPDF(request, id_mov_encabezado):
         'movimientos': mov_solicitado
     }
     pdf = render_to_pdf('pdf.html', data)
+    return HttpResponse(pdf, content_type='application/pdf')
+
+def sacarPDFstock(request):
+    stocks = Stock.objects.filter(cantidad__gt=0)
+    cantidad_productos = stocks.count()
+    total_productos = sum([item.cantidad for item in stocks])
+    total_plata = sum([item.monto_total for item in stocks])
+    data = {
+        'stocks': stocks,
+        'hora': datetime.now,
+        'cant_prod': cantidad_productos,
+        'tot_prod': total_productos,
+        'tot_plata': total_plata
+    }
+    pdf = render_to_pdf('pdfStock.html', data)
+    return HttpResponse(pdf, content_type='application/pdf')
+
+
+def sacarPDFSinstock(request):
+    stocks = Stock.objects.filter(cantidad=0)
+    cantidad_productos = stocks.count()
+
+    data = {
+        'stocks': stocks,
+        'hora': datetime.now,
+        'cant_prod': cantidad_productos,
+
+    }
+    pdf = render_to_pdf('pdfSinStock.html', data)
     return HttpResponse(pdf, content_type='application/pdf')

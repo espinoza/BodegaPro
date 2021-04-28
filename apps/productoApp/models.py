@@ -105,7 +105,7 @@ class Producto(models.Model):
     #stock_data - STOCK (.cantidad, .monto_total)
 
     def __str__(self):
-        return f"Producto {self.name}"
+        return f"Producto Id.{self.id} - {self.name}"
 
     objects = ProductoManager()
 

@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extraStyles %}
+        <title>Title</title>
+        <style type="text/css">
+            .customers {
+            font-family: Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 10px;
+            }
+
+            .customers td, .customers th {
+            border: 1px solid #ddd;
+            padding: 8px;
+            }
+
+            .customers tr:nth-child(even){background-color: #f2f2f2;}
+
+            .customers tr:hover {background-color: #ddd;}
+
+            .customers th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #4CAF50;
+            color: white;
+            }
+        </style>
+{% endblock %}
+
+{% block extraScripts %}
+<script src="{% static 'js/functionsProductos.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+<h1>Reporte de productos con stocks</h1>
+
+<table class="customers">
+      <thead>
+        <tr>
+          <th scope="col">Fecha de reporte</th>
+          <th scope="col">Cantidad de ítems con stock</th>
+          <th scope="col">Cantidad stock total</th>
+          <th scope="col">Monto total stocj</th>
+        </tr>
+    </thead>
+         <td scope="col">{{hora}}</td>
+            <td scope="col">{{cant_prod}}</td>
+            <td scope="col">{{tot_prod}}</td>
+            <td scope="col">$ {{tot_plata}}</td>
+</table>
+
+    <table class="customers">
+      <thead>
+        <tr>
+          
+          <th scope="col">Cod</th>
+          <th scope="col" style="width:40%">Descripcion</th>
+          <th scope="col" >Familia</th>
+          <th scope="col" >Stock</th>
+          <th scope="col" >Un</th>
+          <th scope="col" >$Monto Total</th>
+         
+        </tr>
+      </thead>
+        {% for item in stocks %}
+        <tr id="tr-{{ item.producto.id }}">
+            
+            <td scope="col">{{ item.producto.cod }}</td>
+            <td scope="col">{{ item.producto.name }}</td>
+            <td scope="col">{{ item.producto.familia.name }}</td>
+            <td scope="col">{{ item.cantidad}}</td>
+            <td scope="col">{{ item.producto.unidad_medida.name }}</td>
+            <td scope="col">$ {{ item.monto_total}}</td>
+            
+            
+        </tr>
+        {% empty %}
+        <tr>
+            <td></td>
+            <td><p>No hay productos en la lista</p></td>
+        </tr>
+            
+        {% endfor %}
+    </table>
+
+
+
+{% endblock %}
