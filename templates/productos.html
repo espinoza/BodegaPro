@@ -11,6 +11,10 @@
 <script src="{% static 'js/functionsProductos.js' %}"></script>
 {% endblock %}
 
+{% block modales %}
+{% include "modalprod.html" %}
+{% endblock %}
+
 {% block content %}
 
 <h3>Maestro de Productos</h3>
@@ -22,6 +26,42 @@
     {% endfor %}
 </ul>
 {% endif %}
+
+
+<form action="" id="form-filter" method="POST">
+    {% csrf_token %}
+    <div class="row">
+        {% if tipo == 'edit' %}
+        <div class="col-md-2 form-floating mb-3">
+            <select class="form-select" name="isactive" id="filter-isactive">
+                <option value="1" selected>Activos</option>
+                <option value="0">Todos</option>
+                <option value="-1">Inactivos</option>
+            </select>
+            <label class="mgl08rem" for="filter-isactive">Estado</label>
+        </div>
+        {% endif %}
+        <div class="col-md-2 form-floating mb-3">
+            <select class="form-select" name="familias" id="filter-familia">
+                {% if not new_product.familia_id %}
+                <option value="0" selected>TODAS</option>
+                {% endif %}
+                {% for familia in familias %}
+                <option value="{{ familia.id }}">{{ familia.name }}</option>
+                {% endfor %}
+            </select>
+            <label class="mgl08rem" for="filter-familia">Familia</label>
+        </div>
+        <div class="col-md-4 form-floating mb-3">
+            <input type="text" class="form-control" id="filter-contains" name="contains" placeholder="Palabras clave..." >
+            <label class="mgl08rem" for="filter-contains">Producto contiene...</label>
+        </div>
+
+        <button class="col-md-1 btn btn-success h-red" id="btn-filter">Filtrar</button> 
+        <button class="col-md-1 btn btn-secondary h-red" id="btn-filter-reset">Borrar</button> 
+
+    </div>
+</form>
 
 {% if tipo == 'edit' %}
 <form action="{% url 'newproduct' %}" id="form-add-item" enctype="multipart/form-data" method="POST">
@@ -86,42 +126,14 @@
     </thead>
     <tbody id="table-body">
         <!--dynamic content here-->
-        {% for producto in productos %}
-        <tr id="tr-{{ producto.id }}">
-            <td scope="col"><img class="avatar" src="/media/{{ producto.img_url }}" alt="Prod Img"></td>
-            <td scope="col">{{ producto.cod }}</td>
-            <td scope="col">{{ producto.name }}</td>
-            <td scope="col">{{ producto.cantidad }}</td>
-            <td scope="col">{{ producto.unidad_medida.name }}</td>
-            <td scope="col">{{ producto.familia.name }}</td>
-            <td scope="col">{{ producto.precio_unit }}</td>
-            {% if tipo == 'edit' %}
-            <td scope="col">{% if producto.is_active %}A{% else %}I{% endif %}</td>
-            <td scope="col">
-                <button class="btn btn-outline-secondary" id="{{producto.id}}" data-bs-toggle="modal" data-bs-target="#editModal">Edit</button> |
-                <button class="btn btn-outline-primary" id="img-{{ producto.id }}">IMG...</button> |
-                {% if producto.is_active %}
-                <button class="btn btn-outline-danger" id="desactivar-{{ producto.id }}">Desactivar</button>
-                {% else %}
-                <button class="btn btn-outline-success" id="activar-{{ producto.id }}">Activar</button>
-                {% endif %}
-            </td>
-            {% endif %}
-        </tr>
-        {% empty %}
-        <tr>
-            <td></td>
-            <td colspan="{% if tipo == 'view' %}7{% else %}8{% endif %}">Sin productos en esta clasificación.</td> 
-        </tr>
-        {% endfor %}
-    
+        
     </tbody>
   </table>
-  <input type="hidden" value="" id="id-to-edit">
+  <input type="hidden" value="{{ tipo }}" id="template-tipo">
 
 
 <script>
-    cargarProductos('{{ tipo }}')
+    getProductos()
 </script>
 
 {% endblock %}

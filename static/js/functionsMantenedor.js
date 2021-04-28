@@ -66,6 +66,9 @@ $(document).ready( function(){
 function editUser(id_user){
 
     let data = $('#form-modal').serialize();
+
+    console.log(data)
+
     data += `&id=${id_user}`;
     var tabla = $('#select-tabla').val();
     data += `&tabla_name=${tabla}`;

@@ -23,12 +23,12 @@
 
 .avatar{
     vertical-align: middle;
-    width: 65px;
-    height: 65px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
+    overflow:hidden;
+    padding: 0px;
 }
 
-#file-upload-button{
-    background-color: green;
-}
+
 
