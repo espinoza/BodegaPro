@@ -1,10 +1,11 @@
 
 from django.http.response import JsonResponse
 from apps.mantenedorApp.models import Area, TipoMov, Estado
+from apps.productoApp.models import Producto
 from django.shortcuts import render, redirect
 from apps.loginApp.models import User
 from .models import MovEncabezado, MovItem, MovEstado, MovEncabezado, Stock
-from .forms import NewMovEncabezadoForm, EditMovEncabezadoForm
+from .forms import NewMovEncabezadoForm, EditMovEncabezadoForm, AddProductoToMovForm
 from django.contrib import messages
 
 
@@ -14,6 +15,7 @@ def gotoDashboard(request,id_user,tipo):
         all_areas=Area.objects.filter(is_active = True).order_by('pos')
         all_movimientos=TipoMov.objects.filter(is_active = True).order_by('pos')
         print(id_user)
+
         if len(User.objects.filter(id=id_user))>0:
             this_user= User.objects.get(id=id_user)
         else:
@@ -82,13 +84,16 @@ def createNewMov(request):
 
             new_mov_encabezado = MovEncabezado()
             new_mov_encabezado.descripcion = request.POST["descripcion"]
-            # TODO: corregir, obviamente el folio no se obtiene así
-            new_mov_encabezado.folio = 123456
             area = Area.objects.get(id=request.POST["area"])
             new_mov_encabezado.area = area
             tipo_mov = TipoMov.objects.get(id=request.POST["tipo_mov"])
             new_mov_encabezado.tipo_mov = tipo_mov
+            new_mov_encabezado.folio = tipo_mov.folio.num_folio
             new_mov_encabezado.save()
+
+            folio = tipo_mov.folio
+            folio.num_folio += 1
+            folio.save()
 
             new_mov_estado = MovEstado()
             new_mov_estado.mov_encabezado = new_mov_encabezado
@@ -97,7 +102,7 @@ def createNewMov(request):
             new_mov_estado.nota = ""
             new_mov_estado.save()
 
-            return redirect("/movs/" + str(new_mov_encabezado.id))
+            return redirect("/movs/view/" + str(new_mov_encabezado.id))
     
     context = {
         "form": form,
@@ -119,23 +124,51 @@ def gotoMov(request, id_mov_encabezado):
         return redirect("/")
     mov_encabezado = mov_encabezado[0]
 
+    producto_form = AddProductoToMovForm()
+    context = {}
+
     if request.method == "POST":
-        form = EditMovEncabezadoForm(request.POST)
-        if form.is_valid():
-            mov_encabezado.descripcion = request.POST["descripcion"]
-            mov_encabezado.area = Area.objects.get(id=request.POST["area"])
-            mov_encabezado.save()
+
+        if "descripcion" in request.POST:
+            encabezado_form = EditMovEncabezadoForm(request.POST)
+            if encabezado_form.is_valid():
+                mov_encabezado.descripcion = request.POST["descripcion"]
+                mov_encabezado.area = Area.objects.get(id=request.POST["area"])
+                mov_encabezado.save()
+
+        if "cant_solicitada" in request.POST:
+            producto_form = AddProductoToMovForm(request.POST)
+            if producto_form.is_valid():
+                cod = request.POST["cod"]
+                name = request.POST["name"]
+                cant_solicitada = request.POST["cant_solicitada"]
+
+                if len(cod) > 0:
+                    producto = Producto.objects.filter(cod=cod)
+                if len(name) > 0:
+                    producto = Producto.objects.filter(name=name)
+
+                if len(producto) == 0:
+                    producto_form.add_error("cod", "Producto no encontrado")
+                if len(producto) > 1:
+                    context["posibles_productos"] = producto
+                if len(producto) == 1:
+                    MovItem.objects.create(
+                        mov_encabezado=mov_encabezado,
+                        producto=producto[0],
+                        cant_solicitada=request.POST["cant_solicitada"]
+                    )
 
     initial_data = {
         "descripcion": mov_encabezado.descripcion,
         "area": mov_encabezado.area
     }
-    form = EditMovEncabezadoForm(initial=initial_data)
-    context = {
-        "form": form,
-        "mov_encabezado": mov_encabezado,
-        "button_txt": "Actualizar"
-    }
+    encabezado_form = EditMovEncabezadoForm(initial=initial_data)
+
+    context["encabezado_form"] = encabezado_form
+    context["producto_form"] = producto_form
+    context["mov_encabezado"] = mov_encabezado
+    context["button_txt"] = "Actualizar"
 
     return render(request, "editMov.html", context)
   
