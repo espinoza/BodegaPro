@@ -5,7 +5,8 @@ from apps.productoApp.models import Producto
 from django.shortcuts import render, redirect
 from apps.loginApp.models import User
 from .models import MovEncabezado, MovItem, MovEstado, MovEncabezado, Stock
-from .forms import NewMovEncabezadoForm, EditMovEncabezadoForm, AddProductoToMovForm
+from .forms import NewMovEncabezadoForm, EditMovEncabezadoForm, \
+                   AddProductoToMovForm
 from django.contrib import messages
 
 
@@ -124,6 +125,34 @@ def gotoMov(request, id_mov_encabezado):
         return redirect("/")
     mov_encabezado = mov_encabezado[0]
 
+    if mov_encabezado.estado == "CREADO":
+        return redirect("/movs/solicitud/" + str(mov_encabezado.id))
+
+    if mov_encabezado.estado == "SOLICITADO":
+        # TODO: Esto debería redirigir a autorización
+        return redirect("/")
+
+    if mov_encabezado.estado == "AUTORIZADO":
+        # TODO: Esto debería redirigir a ejecución
+        return redirect("/")
+    
+
+def solicitud(request, id_mov_encabezado):
+    if "id" not in request.session:
+        return redirect("/")
+    user = User.objects.filter(id=request.session["id"])
+    if not user:
+        return redirect("/")
+    logged_user = user[0]
+
+    mov_encabezado = MovEncabezado.objects.filter(id=id_mov_encabezado)
+    if not mov_encabezado:
+        return redirect("/")
+    mov_encabezado = mov_encabezado[0]
+
+    if mov_encabezado.estado not in ["CREADO", "CANCELADO"]:
+        return redirect("/")
+
     producto_form = AddProductoToMovForm()
     context = {}
 
@@ -169,6 +198,13 @@ def gotoMov(request, id_mov_encabezado):
     context["producto_form"] = producto_form
     context["mov_encabezado"] = mov_encabezado
     context["button_txt"] = "Actualizar"
+
+    context["user_solicitando"] = False
+    if mov_encabezado.estado == "CREADO":
+        mov_estado_creado = mov_encabezado.mov_estados \
+                            .get(estado__name="CREADO")
+        if mov_estado_creado.user == logged_user:
+            context["user_solicitando"] = True
 
     return render(request, "editMov.html", context)
   
