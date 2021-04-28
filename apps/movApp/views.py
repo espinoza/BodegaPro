@@ -5,7 +5,8 @@ from apps.productoApp.models import Producto
 from django.shortcuts import render, redirect
 from apps.loginApp.models import User
 from .models import MovEncabezado, MovItem, MovEstado, MovEncabezado, Stock
-from .forms import NewMovEncabezadoForm, EditMovEncabezadoForm, AddProductoToMovForm
+from .forms import NewMovEncabezadoForm, EditMovEncabezadoForm, \
+                   AddProductoToMovForm
 from django.contrib import messages
 
 
@@ -125,6 +126,34 @@ def gotoMov(request, id_mov_encabezado):
         return redirect("/")
     mov_encabezado = mov_encabezado[0]
 
+    if mov_encabezado.estado == "CREADO":
+        return redirect("/movs/solicitud/" + str(mov_encabezado.id))
+
+    if mov_encabezado.estado == "SOLICITADO":
+        # TODO: Esto debería redirigir a autorización
+        return redirect("/")
+
+    if mov_encabezado.estado == "AUTORIZADO":
+        # TODO: Esto debería redirigir a ejecución
+        return redirect("/")
+    
+
+def solicitud(request, id_mov_encabezado):
+    if "id" not in request.session:
+        return redirect("/")
+    user = User.objects.filter(id=request.session["id"])
+    if not user:
+        return redirect("/")
+    logged_user = user[0]
+
+    mov_encabezado = MovEncabezado.objects.filter(id=id_mov_encabezado)
+    if not mov_encabezado:
+        return redirect("/")
+    mov_encabezado = mov_encabezado[0]
+
+    if mov_encabezado.estado not in ["CREADO", "CANCELADO"]:
+        return redirect("/")
+
     producto_form = AddProductoToMovForm()
     context = {}
 
@@ -171,10 +200,20 @@ def gotoMov(request, id_mov_encabezado):
     context["mov_encabezado"] = mov_encabezado
     context["button_txt"] = "Actualizar"
 
-    return render(request, "editMov.html", context)
+    context["user_solicitando"] = False
+    if mov_encabezado.estado == "CREADO":
+        mov_estado_creado = mov_encabezado.mov_estados \
+                            .get(estado__name="CREADO")
+        if mov_estado_creado.user == logged_user:
+            context["user_solicitando"] = True
 
+    return render(request, "editMov.html", context)
+  
 
 def eliminarItem(request, id_mov_encabezado):
+    # NOTE: Falta no permitir que otro usuario modifique el formulario
+    # y elimine un item de otro movimiento, o al menos de un movimiento
+    # que no le corresponde
     if "id" not in request.session:
         return redirect("/")
     user = User.objects.filter(id=request.session["id"])
@@ -190,6 +229,9 @@ def eliminarItem(request, id_mov_encabezado):
 
 
 def editarItem(request, id_mov_encabezado):
+    # NOTE: Falta no permitir que otro usuario modifique el formulario
+    # y edite un item de otro movimiento, o al menos de un movimiento
+    # que no le corresponde
     if "id" not in request.session:
         return redirect("/")
     user = User.objects.filter(id=request.session["id"])
@@ -208,6 +250,9 @@ def editarItem(request, id_mov_encabezado):
 
 
 def cambiarEstado(request, id_mov_encabezado):
+    # NOTE: falta tener mucho cuidado con los permisos para que
+    # no sea posible pasarlos por alto si se modifican los
+    # formularios en el html
     if "id" not in request.session:
         return redirect("/")
     user = User.objects.filter(id=request.session["id"])
@@ -215,15 +260,20 @@ def cambiarEstado(request, id_mov_encabezado):
         return redirect("/")
     logged_user = user[0]
     try:
-        estado = Estado.objects.get(name=request.POST['action'])
+        new_estado = Estado.objects.get(name=request.POST['new_status'])
         mov = MovEncabezado.objects.get(id=id_mov_encabezado)
         new_mov_estado = MovEstado()
         new_mov_estado.mov_encabezado = mov
-        new_mov_estado.estado = estado
+        new_mov_estado.estado = new_estado
         new_mov_estado.user = logged_user
         new_mov_estado.nota = ""
         new_mov_estado.save()
 
-        return redirect('dashboard')
+        if new_estado.name == "SOLICITADO":
+            for mov_item in mov.mov_items.all():
+                mov_item.cantidad_autorizada = mov_item.cantidad_solicitada
+                mov_item.save()
+
+        return redirect('/movs/0/activemov')
     except:
-        return redirect(f"/movs/view/{id_mov_encabezado}")
+        return redirect("/")

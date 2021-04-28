@@ -135,6 +135,13 @@ class User(models.Model):
     areas_para_ejecutar = models.ManyToManyField(
         Area, through="UserEjecuta", related_name="users_que_ejecutan")
 
+    tipos_para_solicitar = models.ManyToManyField(
+        TipoMov, through="UserSolicita", related_name="users_que_solicitan")
+    tipos_para_autorizar = models.ManyToManyField(
+        TipoMov, through="UserAutoriza", related_name="users_que_autorizan")
+    tipos_para_ejecutar = models.ManyToManyField(
+        TipoMov, through="UserEjecuta", related_name="users_que_ejecutan")
+
     #movs_asociados - MovEstado
 
     def __str__(self):
