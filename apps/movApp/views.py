@@ -140,14 +140,14 @@ def gotoMov(request, id_mov_encabezado):
         areas_para_autorizar = logged_user.areas_para_autorizar.all()
         tipos_para_autorizar = logged_user.tipos_para_autorizar.all()
         if (mov_encabezado.area in areas_para_autorizar
-                and mov_encabezado.tipo_mov in tipos_para_autorizar):
+                and mov_encabezado.tipo_mov in tipos_para_autorizar) or (logged_user.isAdmin):
             return redirect("/movs/autorizacion/" + str(mov_encabezado.id))
         areas_para_ver = logged_user.areas_para_solicitar.all() \
                   .union(logged_user.areas_para_ejecutar.all())
         tipos_para_ver = logged_user.tipos_para_solicitar.all() \
                   .union(logged_user.tipos_para_ejecutar.all())
         if (mov_encabezado.area in areas_para_ver
-                and mov_encabezado.tipo_mov in tipos_para_ver):
+                and mov_encabezado.tipo_mov in tipos_para_ver) or (logged_user.isAdmin):
             return redirect("/movs/solicitud/" + str(mov_encabezado.id))
         return redirect("/")
 
