@@ -1,5 +1,5 @@
 
-from django.http.response import JsonResponse
+from django.http.response import JsonResponse, HttpResponse
 from apps.mantenedorApp.models import Area, TipoMov, Estado
 from apps.productoApp.models import Producto
 from django.shortcuts import render, redirect
@@ -8,6 +8,7 @@ from .models import MovEncabezado, MovItem, MovEstado, MovEncabezado, Stock
 from .forms import NewMovEncabezadoForm, EditMovEncabezadoForm, \
                    AddProductoToMovForm
 from django.contrib import messages
+from .utils import render_to_pdf
 
 
 def gotoDashboard(request, id_user, tipo):
@@ -280,3 +281,15 @@ def cambiarEstado(request, id_mov_encabezado):
         return redirect('/movs/0/activemov')
     except:
         return redirect("/")
+
+
+def sacarPDF(request, id_mov_encabezado):
+    mov = MovEncabezado.objects.get(id=id_mov_encabezado)
+    mov_solicitado = MovEstado.objects.filter(mov_encabezado=mov)
+    print(mov_solicitado)
+    data = {
+        'mov_encabezado': mov,
+        'movimientos': mov_solicitado
+    }
+    pdf = render_to_pdf('pdf.html', data)
+    return HttpResponse(pdf, content_type='application/pdf')

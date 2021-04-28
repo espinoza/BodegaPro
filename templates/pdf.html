@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extraStyles %}
+        <title>Title</title>
+        <style type="text/css">
+            .customers {
+            font-family: Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 10px;
+            }
+
+            .customers td, .customers th {
+            border: 1px solid #ddd;
+            padding: 8px;
+            }
+
+            .customers tr:nth-child(even){background-color: #f2f2f2;}
+
+            .customers tr:hover {background-color: #ddd;}
+
+            .customers th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #4CAF50;
+            color: white;
+            }
+        </style>
+{% endblock %}
+
+{% block extraScripts %}
+<script src="{% static 'js/functionsProductos.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+<h1>Movimiento de {{mov_encabezado.tipo_mov.name}} - Estado {{mov_encabezado.estado}}</h1>
+
+
+
+
+<h2>Folio nro: {{mov_encabezado.folio}}</h2>
+
+<table class="customers">
+      <thead>
+        <tr>
+          <th scope="col">Pasos</th>
+        </tr>
+    </thead>
+     {% for estados in movimientos%}
+        <tr id="tr-{{ mov_item.producto.id }}">
+            
+            <td scope="col">{{estados.estado.name}} por {{estados.user.name1}} {{estados.user.last_name1}} en {{estados.updated_at}}</td>
+                  
+        </tr>
+    {% endfor %}
+
+    <table class="customers">
+      <thead>
+        <tr>
+          
+          <th scope="col">Cod</th>
+          <th scope="col" style="width:40%">Descripcion</th>
+          <th scope="col" >Cant. Solicitada</th>
+          <th scope="col" >Un</th>
+          <th scope="col" >Cant. Autorizada</th>
+          <th scope="col" >Cant. Concretada</th>
+          <th scope="col" >$ Unit</th>
+         
+        </tr>
+    </thead>
+     {% for mov_item in mov_encabezado.mov_items.all %}
+        <tr id="tr-{{ mov_item.producto.id }}">
+            
+            <td scope="col">{{ mov_item.producto.cod }}</td>
+            <td scope="col">{{ mov_item.producto.name }}</td>
+            <td scope="col">{{ mov_item.cant_solicitada}}</td>
+            <td scope="col">{{ mov_item.producto.unidad_medida.name }}</td>
+            <td scope="col">{% if mov_item.cant_autorizada == None %} 0 {%else%} {{ mov_item.cant_autorizada }} {%endif%}</td>
+            <td scope="col">{% if mov_item.cant_ejecutada == None %} 0 {%else%} {{ mov_item.cant_ejecutada }} {%endif%}</td>
+            <td scope="col">{% if mov_item.precio_unit == None %} 0 {%else%} {{ mov_item.precio_unit }} {%endif%}</td>
+            
+        </tr>
+    {% empty %}
+    <tr>
+        <td></td>
+        <td><p>No hay productos en la lista</p></td>
+    </tr>
+        
+    {% endfor %}
+
+
+
+{% endblock %}
