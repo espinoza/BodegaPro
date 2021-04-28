@@ -112,7 +112,7 @@ def createNewMov(request):
 
     context = {
         "encabezado_form": form,
-        "button_txt": "Crear"
+        "user_creando": True
     }
     return render(request, "editMov.html", context)
 
@@ -215,7 +215,6 @@ def solicitud(request, id_mov_encabezado):
     context["encabezado_form"] = encabezado_form
     context["producto_form"] = producto_form
     context["mov_encabezado"] = mov_encabezado
-    context["button_txt"] = "Actualizar"
 
     context["user_solicitando"] = False
     if mov_encabezado.estado == "CREADO":
