@@ -210,55 +210,10 @@ def solicitud(request, id_mov_encabezado):
     return render(request, "editMov.html", context)
   
 
-def solicitar_cancelar(request, id_mov_encabezado):
-
-    # NOTE: se requiere dos formularios con campo oculto
-    # cuyos valores son CANCELAR y SOLICITAR, en variable `action`
-    if request.method == "POST":
-        if "id" not in request.session:
-            return redirect("/")
-        user = User.objects.filter(id=request.session["id"])
-        if not user:
-            return redirect("/")
-        logged_user = user[0]
-    
-        mov_encabezado = MovEncabezado.objects.filter(id=id_mov_encabezado)
-        if not mov_encabezado:
-            return redirect("/")
-        mov_encabezado = mov_encabezado[0]
-    
-        if mov_encabezado.estado != "CREADO":
-            return redirect("/")
-        mov_estado_creado = mov_encabezado.mov_estados.get(estado__name="CREADO")
-    
-        action = request.POST["action"]
-        if action not in ["SOLICITAR", "CANCELAR"]:
-            return redirect("/")
-        
-        if action == "SOLICITAR":
-            estado = Estado.objects.filter(name="SOLICITADO")
-        if action == "CANCELAR":
-            estado = Estado.objects.filter(name="CANCELADO")
-        if not estado:
-            return redirect("/")
-        estado = estado[0]
-        
-        new_mov_estado = MovEstado()
-        new_mov_estado.mov_encabezado = mov_encabezado
-        new_mov_estado.estado = estado
-        new_mov_estado.user = logged_user
-        new_mov_estado.nota = mov_estado_creado.nota
-        new_mov_estado.save()
-
-        if action == "SOLICITAR":
-            for mov_item in mov_encabezado.mov_items.all():
-                mov_item.cantidad_autorizada = mov_item.cantidad_solicitada
-                mov_item.save()
-
-    return redirect("/movs/" + str(logged_user.id) + "/activemov")
-
-
 def eliminarItem(request, id_mov_encabezado):
+    # NOTE: Falta no permitir que otro usuario modifique el formulario
+    # y elimine un item de otro movimiento, o al menos de un movimiento
+    # que no le corresponde
     if "id" not in request.session:
         return redirect("/")
     user = User.objects.filter(id=request.session["id"])
@@ -274,6 +229,9 @@ def eliminarItem(request, id_mov_encabezado):
 
 
 def editarItem(request, id_mov_encabezado):
+    # NOTE: Falta no permitir que otro usuario modifique el formulario
+    # y edite un item de otro movimiento, o al menos de un movimiento
+    # que no le corresponde
     if "id" not in request.session:
         return redirect("/")
     user = User.objects.filter(id=request.session["id"])
@@ -292,6 +250,9 @@ def editarItem(request, id_mov_encabezado):
 
 
 def cambiarEstado(request, id_mov_encabezado):
+    # NOTE: falta tener mucho cuidado con los permisos para que
+    # no sea posible pasarlos por alto si se modifican los
+    # formularios en el html
     if "id" not in request.session:
         return redirect("/")
     user = User.objects.filter(id=request.session["id"])
@@ -299,15 +260,20 @@ def cambiarEstado(request, id_mov_encabezado):
         return redirect("/")
     logged_user = user[0]
     try:
-        estado = Estado.objects.get(name=request.POST['action'])
+        new_estado = Estado.objects.get(name=request.POST['new_status'])
         mov = MovEncabezado.objects.get(id=id_mov_encabezado)
         new_mov_estado = MovEstado()
         new_mov_estado.mov_encabezado = mov
-        new_mov_estado.estado = estado
+        new_mov_estado.estado = new_estado
         new_mov_estado.user = logged_user
         new_mov_estado.nota = ""
         new_mov_estado.save()
 
-        return redirect('dashboard')
+        if new_estado.name == "SOLICITADO":
+            for mov_item in mov.mov_items.all():
+                mov_item.cantidad_autorizada = mov_item.cantidad_solicitada
+                mov_item.save()
+
+        return redirect('/movs/0/activemov')
     except:
-        return redirect(f"/movs/view/{id_mov_encabezado}")
+        return redirect("/")
