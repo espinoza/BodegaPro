@@ -10,13 +10,36 @@
 <div>
     <form method="POST">
         {% csrf_token %}
-        {{form}}
+        {{encabezado_form}}
         <input class="btn btn-success" type="submit" value="{{button_txt}}">
     </form>
 </div>
 
 {% if mov_encabezado %}
     <p>{{mov_encabezado.estado}}</p>
+
+    {% if producto_form %}
+        <form method="POST">
+            {% csrf_token %}
+            {{ producto_form }}
+            <input type="submit" value="+">
+        </form>
+        {% if posibles_productos %}
+            <p>Existe más de un producto con ese nombre:</p>
+            <ul>
+            {% for producto in posibles_productos.all %}
+                <li>{{producto.cod}} {{producto.name}}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endif %}
+
+    {% for mov_item in mov_encabezado.mov_items.all %}
+        <p>{{ mov_item.producto.name }}</p>
+    {% empty %}
+        <p>No hay productos en la lista</p>
+    {% endfor %}
+
 {% endif %}
 
 {% endblock %}
