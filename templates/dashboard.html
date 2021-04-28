@@ -8,15 +8,15 @@
 {% block title %}BodegaPro{% endblock %}
 
 {% block content %}
-<div class="container" >
+<div class="container b" >
     <div class="row">
         <h3 class="col-md-6 col-9">
             {% if id_user == request.session.id %}
             Mis Movimientos 
             {% elif id_user > 0 %}
-            Movimientos de {{ user_rdc.full_name }} ({{ user_rdc.more_info.alias }})
-            {% else %}
-            Todas los Movimientos
+            Movimientos de {{ user.full_name }} 
+            {% elif id_user == 0 %}
+            Todos los Movimientos
             {% endif %}
             {% if tipo == "activemov" %}
             <span class="badge rounded-pill bg-primary">Activas</span>
@@ -64,8 +64,8 @@
                             <th scope="col-1"></th>
                             <th scope="col-1">#</th>
                             <th scope="col-1">E/S</th>
-                            <th scope="col-1">folio</th> 
-                            <th scope="col-1">descripción</th>                            
+                            <th scope="col-1">Area</th> 
+                            <th scope="col-1">folio</th>                          
                             <th scope="col-1">N Items</th>
                             <th scope="col-1">$ Total</th>
                             <th scope="col-1">Estado</th>
@@ -73,18 +73,18 @@
                         </tr>
                     </thead>                    
                     <tbody>
+                        {% if id_user == 0 %} 
                         {%for encabezado in all_encabezados%} 
                         {% if tipo == "activemov" %}
-                        {% if encabezado.estado != "CANCELADO" and encabezado.estado != "NO APROBADO" and encabezado.estado != "NO AUTORIZADO" and encabezado.estado != "CREADO" and encabezado.estado != "EJECUTADO"%}                       
+                        {% if encabezado.estado != "CANCELADO" and encabezado.estado != "NO APROBADO" and encabezado.estado != "NO AUTORIZADO"  and encabezado.estado != "EJECUTADO"%}                       
                         <tr class="bg-light">
                             <td scope="col-1"><a class="btn btn-sm btn-secondary" href="/pdf">PDF</a></td>
-                            <td scope="col-1">{{encabezado.id}}</td>
+                            <td scope="col-1">{{encabezado.id}}</td>                            
                             <td scope="col-1">{%if encabezado.tipo_mov.name == 'ENTRADA'%} E {%elif encabezado.tipo_mov.name == 'SALIDA'%} S {%endif%}</td>
                             <td scope="col-1">{{encabezado.area.name}}</td>
                             <td scope="col-1">
                                 <a href="{% url 'goto_mov' encabezado.id %}">{{encabezado.folio}}</a>
                             </td>
-                            <td scope="col-1">{{encabezado.descripcion}}</td> 
                             {%if encabezado.estado == "SOLICITADO"%}                        
                             <td scope="col-1">                            
                             {{encabezado.num_items_solicitado}}
@@ -102,40 +102,58 @@
                             <td scope="col-1">{{encabezado.monto_ejecutado}}</td>
                             {%else%}
                             <td scope="col-1">                            
-                                {{encabezado.num_items_autorizado}}
+                                {{encabezado.num_items_solicitado}}
                             </td>
-                            <td scope="col-1">{{encabezado.monto_autorizado}}</td>                                
+                            <td scope="col-1">{{encabezado.monto_solicitado}}</td>                                
                             {%endif%}
                             <td class="text-center"><p class="text-center text-white bg-success rounded-pill">{{encabezado.estado}}</p></td>
                             <td scope="col-3">
                                 <div class="container">
                                     <div class="row">   
-                                        <div class="col-4">                                          
-                                            {%for mov_estado in encabezado.mov_estados.all%}                                            
-                                            {%if mov_estado.estado.name == "SOLICITADO"%}                                           
-                                            <p class=" container btn btn-sm btn-success text-white">{{mov_estado.user.name1}} <br> Solicitó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
-                                            {%elif mov_estado.estado.name == "CREADO"%}                                            
-                                            <p class="container btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Creó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
-                                            {%elif mov_estado.estado.name == "CANCELADO"%}
-                                            <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Canceló <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                        <div class="col-4"> 
+                                            {%if encabezado.estado == "SOLICITADO" or encabezado.estado == "AUTORIZADO" or encabezado.estado == "NO AUTORIZADO" or encabezado.estado == "EJECUTADO"%}                                         
+                                                {%for mov_estado in encabezado.mov_estados.all%}                                            
+                                                    {%if mov_estado.estado.name == "SOLICITADO" %}                                           
+                                                    <p class=" container btn btn-sm btn-success text-white">{{mov_estado.user.name1}} <br> Solicitó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    {%endif%}
+                                                {%endfor%}
+                                            {%elif encabezado.estado == "CREADO" %}                                         
+                                                {%for mov_estado in encabezado.mov_estados.all%}                                            
+                                                    {%if mov_estado.estado.name == "CREADO" %}                                           
+                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Creó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    {%endif%}
+                                                {%endfor%}
+                                            {%elif encabezado.estado == "CANCELADO" %}                                         
+                                                {%for mov_estado in encabezado.mov_estados.all%}                                            
+                                                    {%if mov_estado.estado.name == "CANCELADO" %}                                           
+                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Canceló <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    {%endif%}
+                                                {%endfor%}
                                             {%endif%}
-                                            {%endfor%}
                                         </div>
                                         <div class="col-4">
-                                            {%for mov_estado in encabezado.mov_estados.all%} 
-                                            {%if mov_estado.estado.name == "AUTORIZADO"%} 
-                                            <p class="container  btn btn-sm btn-primary text-white">{{mov_estado.user.name1}} <br> Autorizó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
-                                            {%elif mov_estado.estado.name == "NO AUTORIZADO"%}  
-                                            <p class="container bg-primary btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Rechazó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                            {%if encabezado.estado == "AUTORIZADO" or encabezado.estado == "EJECUTADO"%}    
+                                                {%for mov_estado in encabezado.mov_estados.all%} 
+                                                    {%if mov_estado.estado.name == "AUTORIZADO"%} 
+                                                    <p class="container  btn btn-sm btn-primary text-white">{{mov_estado.user.name1}} <br> Autorizó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    {%endif%}  
+                                                {%endfor%}
+                                            {%elif encabezado.estado == "NO AUTORIZADO" %}                                         
+                                                {%for mov_estado in encabezado.mov_estados.all%}                                            
+                                                    {%if mov_estado.estado.name == "NO AUTORIZADO" %}                                           
+                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> No Autorizó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    {%endif%}
+                                                {%endfor%}
                                             {%endif%}
-                                            {%endfor%}  
                                         </div>
                                         <div class="col-4">
-                                            {%for mov_estado in encabezado.mov_estados.all%} 
-                                            {%if mov_estado.estado.name == "EJECUTADO"%} 
-                                            <p class="container btn btn-sm btn-warning text-white">{{mov_estado.user.name1}} <br> Ejecutó <br>{{mov_estado.created_at|date:"M d, Y"}}</p> 
-                                            {%endif%}
-                                            {%endfor%}                                       
+                                            {%if encabezado.estado == "EJECUTADO" %} 
+                                                {%for mov_estado in encabezado.mov_estados.all%} 
+                                                    {%if mov_estado.estado.name == "EJECUTADO"%} 
+                                                    <p class="container btn btn-sm btn-warning text-white">{{mov_estado.user.name1}} <br> Ejecutó <br>{{mov_estado.created_at|date:"M d, Y"}}</p> 
+                                                    {%endif%}
+                                                {%endfor%}
+                                            {%endif%}                                       
                                         </div>
                                     </div>
                                 </div>
@@ -150,9 +168,8 @@
                             <td scope="col-1">{%if encabezado.tipo_mov.name == 'ENTRADA'%} E {%elif encabezado.tipo_mov.name == 'SALIDA'%} S {%endif%}</td>
                             <td scope="col-1">{{encabezado.area.name}}</td>
                             <td scope="col-1">
-                                <a href="">{{encabezado.folio}}</a>
+                                <a href="{% url 'goto_mov' encabezado.id %}">{{encabezado.folio}}</a>
                             </td>
-                            <td scope="col-1">{{encabezado.descripcion}}</td> 
                             {%if encabezado.estado == "SOLICITADO"%}                        
                             <td scope="col-1">                            
                             {{encabezado.num_items_solicitado}}
@@ -178,39 +195,232 @@
                             <td scope="col-3">
                                 <div class="container">
                                     <div class="row">   
-                                        <div class="col-4">                                          
-                                            {%for mov_estado in encabezado.mov_estados.all%}                                            
-                                            {%if mov_estado.estado.name == "SOLICITADO"%}                                           
-                                            <p class=" container btn btn-sm btn-success text-white">{{mov_estado.user.name1}} <br> Solicitó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
-                                            {%elif mov_estado.estado.name == "CREADO"%}                                            
-                                            <p class="container btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Creó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
-                                            {%elif mov_estado.estado.name == "CANCELADO"%}
-                                            <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Canceló <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                        <div class="col-4"> 
+                                            {%if encabezado.estado == "SOLICITADO" or encabezado.estado == "AUTORIZADO" or encabezado.estado == "NO AUTORIZADO" or encabezado.estado == "EJECUTADO"%}                                         
+                                                {%for mov_estado in encabezado.mov_estados.all%}                                            
+                                                    {%if mov_estado.estado.name == "SOLICITADO" %}                                           
+                                                    <p class=" container btn btn-sm btn-success text-white">{{mov_estado.user.name1}} <br> Solicitó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    {%endif%}
+                                                {%endfor%}
+                                            {%elif encabezado.estado == "CREADO" %}                                         
+                                                {%for mov_estado in encabezado.mov_estados.all%}                                            
+                                                    {%if mov_estado.estado.name == "CREADO" %}                                           
+                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Creó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    {%endif%}
+                                                {%endfor%}
+                                            {%elif encabezado.estado == "CANCELADO" %}                                         
+                                                {%for mov_estado in encabezado.mov_estados.all%}                                            
+                                                    {%if mov_estado.estado.name == "CANCELADO" %}                                           
+                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Canceló <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    {%endif%}
+                                                {%endfor%}
                                             {%endif%}
-                                            {%endfor%}
                                         </div>
                                         <div class="col-4">
-                                            {%for mov_estado in encabezado.mov_estados.all%} 
-                                            {%if mov_estado.estado.name == "AUTORIZADO"%} 
-                                            <p class="container  btn btn-sm btn-primary text-white">{{mov_estado.user.name1}} <br> Autorizó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
-                                            {%elif mov_estado.estado.name == "NO AUTORIZADO"%}  
-                                            <p class="container  btn btn-sm  btn-light text-dark border">{{mov_estado.user.name1}} <br> Rechazó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                            {%if encabezado.estado == "AUTORIZADO" or encabezado.estado == "EJECUTADO"%}    
+                                                {%for mov_estado in encabezado.mov_estados.all%} 
+                                                    {%if mov_estado.estado.name == "AUTORIZADO"%} 
+                                                    <p class="container  btn btn-sm btn-primary text-white">{{mov_estado.user.name1}} <br> Autorizó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    {%endif%}  
+                                                {%endfor%}
+                                            {%elif encabezado.estado == "NO AUTORIZADO" %}                                         
+                                                {%for mov_estado in encabezado.mov_estados.all%}                                            
+                                                    {%if mov_estado.estado.name == "NO AUTORIZADO" %}                                           
+                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> No Autorizó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    {%endif%}
+                                                {%endfor%}
                                             {%endif%}
-                                            {%endfor%}  
                                         </div>
                                         <div class="col-4">
-                                            {%for mov_estado in encabezado.mov_estados.all%} 
-                                            {%if mov_estado.estado.name == "EJECUTADO"%} 
-                                            <p class="container btn btn-sm btn-warning text-white">{{mov_estado.user.name1}} <br> Ejecutó <br>{{mov_estado.created_at|date:"M d, Y"}}</p> 
-                                            {%endif%}
-                                            {%endfor%}                                       
+                                            {%if encabezado.estado == "EJECUTADO" %} 
+                                                {%for mov_estado in encabezado.mov_estados.all%} 
+                                                    {%if mov_estado.estado.name == "EJECUTADO"%} 
+                                                    <p class="container btn btn-sm btn-warning text-white">{{mov_estado.user.name1}} <br> Ejecutó <br>{{mov_estado.created_at|date:"M d, Y"}}</p> 
+                                                    {%endif%}
+                                                {%endfor%}
+                                            {%endif%}                                       
                                         </div>
                                     </div>
                                 </div>
                             </td>                          
                         </tr>
                         {%endif%}
-                        {%endfor%}                                              
+                        {%endfor%} 
+                        {%endif%} 
+                        {% if id_user > 0 %} 
+                        {%for encabezado in mis_encabezados%} 
+                        {% if tipo == "activemov" %}
+                        {% if encabezado.estado != "CANCELADO" and encabezado.estado != "NO APROBADO" and encabezado.estado != "NO AUTORIZADO"  and encabezado.estado != "EJECUTADO"%}                       
+                        <tr class="bg-light">
+                            <td scope="col-1"><a class="btn btn-sm btn-secondary" href="/pdf">PDF</a></td>
+                            <td scope="col-1">{{encabezado.id}}</td>                            
+                            <td scope="col-1">{%if encabezado.tipo_mov.name == 'ENTRADA'%} E {%elif encabezado.tipo_mov.name == 'SALIDA'%} S {%endif%}</td>
+                            <td scope="col-1">{{encabezado.area.name}}</td>
+                            <td scope="col-1">
+                                <a href="{% url 'goto_mov' encabezado.id %}">{{encabezado.folio}}</a>
+                            </td>
+                            {%if encabezado.estado == "SOLICITADO"%}                        
+                            <td scope="col-1">                            
+                            {{encabezado.num_items_solicitado}}
+                            </td>
+                            <td scope="col-1">{{encabezado.monto_solicitado}}</td>
+                            {%elif encabezado.estado == "AUTORIZADO"%}
+                            <td scope="col-1">                            
+                                {{encabezado.num_items_autorizado}}
+                            </td>
+                            <td scope="col-1">{{encabezado.monto_autorizado}}</td>
+                            {%elif encabezado.estado == "EJECUTADO"%}
+                            <td scope="col-1">                            
+                                {{encabezado.num_items_ejecutado}}
+                            </td>
+                            <td scope="col-1">{{encabezado.monto_ejecutado}}</td>
+                            {%else%}
+                            <td scope="col-1">                            
+                                {{encabezado.num_items_solicitado}}
+                            </td>
+                            <td scope="col-1">{{encabezado.monto_solicitado}}</td>                                
+                            {%endif%}
+                            <td class="text-center"><p class="text-center text-white bg-success rounded-pill">{{encabezado.estado}}</p></td>
+                            <td scope="col-3">
+                                <div class="container">
+                                    <div class="row">   
+                                        <div class="col-4"> 
+                                            {%if encabezado.estado == "SOLICITADO" or encabezado.estado == "AUTORIZADO" or encabezado.estado == "NO AUTORIZADO" or encabezado.estado == "EJECUTADO"%}                                         
+                                                {%for mov_estado in encabezado.mov_estados.all%}                                            
+                                                    {%if mov_estado.estado.name == "SOLICITADO" %}                                           
+                                                    <p class=" container btn btn-sm btn-success text-white">{{mov_estado.user.name1}} <br> Solicitó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    {%endif%}
+                                                {%endfor%}
+                                            {%elif encabezado.estado == "CREADO" %}                                         
+                                                {%for mov_estado in encabezado.mov_estados.all%}                                            
+                                                    {%if mov_estado.estado.name == "CREADO" %}                                           
+                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Creó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    {%endif%}
+                                                {%endfor%}
+                                            {%elif encabezado.estado == "CANCELADO" %}                                         
+                                                {%for mov_estado in encabezado.mov_estados.all%}                                            
+                                                    {%if mov_estado.estado.name == "CANCELADO" %}                                           
+                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Canceló <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    {%endif%}
+                                                {%endfor%}
+                                            {%endif%}
+                                        </div>
+                                        <div class="col-4">
+                                            {%if encabezado.estado == "AUTORIZADO" or encabezado.estado == "EJECUTADO"%}    
+                                                {%for mov_estado in encabezado.mov_estados.all%} 
+                                                    {%if mov_estado.estado.name == "AUTORIZADO"%} 
+                                                    <p class="container  btn btn-sm btn-primary text-white">{{mov_estado.user.name1}} <br> Autorizó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    {%endif%}  
+                                                {%endfor%}
+                                            {%elif encabezado.estado == "NO AUTORIZADO" %}                                         
+                                                {%for mov_estado in encabezado.mov_estados.all%}                                            
+                                                    {%if mov_estado.estado.name == "NO AUTORIZADO" %}                                           
+                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> No Autorizó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    {%endif%}
+                                                {%endfor%}
+                                            {%endif%}
+                                        </div>
+                                        <div class="col-4">
+                                            {%if encabezado.estado == "EJECUTADO" %} 
+                                                {%for mov_estado in encabezado.mov_estados.all%} 
+                                                    {%if mov_estado.estado.name == "EJECUTADO"%} 
+                                                    <p class="container btn btn-sm btn-warning text-white">{{mov_estado.user.name1}} <br> Ejecutó <br>{{mov_estado.created_at|date:"M d, Y"}}</p> 
+                                                    {%endif%}
+                                                {%endfor%}
+                                            {%endif%}                                       
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>                          
+                        </tr>
+                        {%endif%}
+                        {%endif%}
+                        {% if tipo != "activemov" %}                     
+                        <tr>
+                            <td scope="col-1"><a class="btn btn-sm btn-secondary" href="/pdf">PDF</a></td>
+                            <td scope="col-1">{{encabezado.id}}</td>
+                            <td scope="col-1">{%if encabezado.tipo_mov.name == 'ENTRADA'%} E {%elif encabezado.tipo_mov.name == 'SALIDA'%} S {%endif%}</td>
+                            <td scope="col-1">{{encabezado.area.name}}</td>
+                            <td scope="col-1">
+                                <a href="{% url 'goto_mov' encabezado.id %}">{{encabezado.folio}}</a>
+                            </td>
+                            {%if encabezado.estado == "SOLICITADO"%}                        
+                            <td scope="col-1">                            
+                            {{encabezado.num_items_solicitado}}
+                            </td>
+                            <td scope="col-1">{{encabezado.monto_solicitado}}</td>
+                            {%elif encabezado.estado == "AUTORIZADO"%}
+                            <td scope="col-1">                            
+                                {{encabezado.num_items_autorizado}}
+                            </td>
+                            <td scope="col-1">{{encabezado.monto_autorizado}}</td>
+                            {%elif encabezado.estado == "EJECUTADO"%}
+                            <td scope="col-1">                            
+                                {{encabezado.num_items_ejecutado}}
+                            </td>
+                            <td scope="col-1">{{encabezado.monto_ejecutado}}</td>
+                            {%else%}
+                            <td scope="col-1">                            
+                                {{encabezado.num_items_autorizado}}
+                            </td>
+                            <td scope="col-1">{{encabezado.monto_autorizado}}</td>                                
+                            {%endif%}
+                            <td class="text-center"><p class="text-center text-white bg-success rounded-pill">{{encabezado.estado}}</p></td>
+                            <td scope="col-3">
+                                <div class="container">
+                                    <div class="row">   
+                                        <div class="col-4"> 
+                                            {%if encabezado.estado == "SOLICITADO" or encabezado.estado == "AUTORIZADO" or encabezado.estado == "NO AUTORIZADO" or encabezado.estado == "EJECUTADO"%}                                         
+                                                {%for mov_estado in encabezado.mov_estados.all%}                                            
+                                                    {%if mov_estado.estado.name == "SOLICITADO" %}                                           
+                                                    <p class=" container btn btn-sm btn-success text-white">{{mov_estado.user.name1}} <br> Solicitó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    {%endif%}
+                                                {%endfor%}
+                                            {%elif encabezado.estado == "CREADO" %}                                         
+                                                {%for mov_estado in encabezado.mov_estados.all%}                                            
+                                                    {%if mov_estado.estado.name == "CREADO" %}                                           
+                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Creó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    {%endif%}
+                                                {%endfor%}
+                                            {%elif encabezado.estado == "CANCELADO" %}                                         
+                                                {%for mov_estado in encabezado.mov_estados.all%}                                            
+                                                    {%if mov_estado.estado.name == "CANCELADO" %}                                           
+                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Canceló <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    {%endif%}
+                                                {%endfor%}
+                                            {%endif%}
+                                        </div>
+                                        <div class="col-4">
+                                            {%if encabezado.estado == "AUTORIZADO" or encabezado.estado == "EJECUTADO"%}    
+                                                {%for mov_estado in encabezado.mov_estados.all%} 
+                                                    {%if mov_estado.estado.name == "AUTORIZADO"%} 
+                                                    <p class="container  btn btn-sm btn-primary text-white">{{mov_estado.user.name1}} <br> Autorizó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    {%endif%}  
+                                                {%endfor%}
+                                            {%elif encabezado.estado == "NO AUTORIZADO" %}                                         
+                                                {%for mov_estado in encabezado.mov_estados.all%}                                            
+                                                    {%if mov_estado.estado.name == "NO AUTORIZADO" %}                                           
+                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> No Autorizó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    {%endif%}
+                                                {%endfor%}
+                                            {%endif%}
+                                        </div>
+                                        <div class="col-4">
+                                            {%if encabezado.estado == "EJECUTADO" %} 
+                                                {%for mov_estado in encabezado.mov_estados.all%} 
+                                                    {%if mov_estado.estado.name == "EJECUTADO"%} 
+                                                    <p class="container btn btn-sm btn-warning text-white">{{mov_estado.user.name1}} <br> Ejecutó <br>{{mov_estado.created_at|date:"M d, Y"}}</p> 
+                                                    {%endif%}
+                                                {%endfor%}
+                                            {%endif%}                                       
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>                          
+                        </tr>
+                        {%endif%}
+                        {%endfor%} 
+                        {%endif%}                                                                               
                     </tbody>
                 </table>
             </div>
