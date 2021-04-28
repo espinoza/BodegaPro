@@ -261,36 +261,73 @@ function cargarProductos(productos){
 
 }
 
+//ERRORES
 
+function eraseErrores(){
+    $(".ajax-err").remove();
+}  
 
+function eraseMessages(){
+    $(".messages").remove();
+}
 
-/*
-        {% for producto in productos %}
-        <tr id="tr-{{ producto.id }}">
-            <td scope="col"><img id="img_url-{{ producto.id }}" class="avatar" src="{{ media_url }}{{ producto.img_url }}" alt="Prod Img"></td>
-            <td scope="col" id="cod-{{ producto.id }}">{{ producto.cod }}</td>
-            <td scope="col" id="name-{{ producto.id }}">{{ producto.name }}</td>
-            <td scope="col">{{ producto.cantidad }}</td>
-            <td scope="col" id="unidad_medida-{{ producto.id }}">{{ producto.unidad_medida.name }}</td>
-            <td scope="col" id="familia-{{ producto.id }}">{{ producto.familia.name }}</td>
-            <td scope="col">{{ producto.precio_unit }}</td>
-            {% if tipo == 'edit' %}
-            <td scope="col">{% if producto.is_active %}A{% else %}I{% endif %}</td>
-            <td scope="col">
-                <button class="btn btn-outline-secondary" id="{{producto.id}}" data-bs-toggle="modal" data-bs-target="#editModal">Edit</button> |
-                <button class="btn btn-outline-primary" id="img-{{ producto.id }}">IMG...</button> |
-                {% if producto.is_active %}
-                <button class="btn btn-outline-danger" id="desactivar-{{ producto.id }}">Desactivar</button>
-                {% else %}
-                <button class="btn btn-outline-success" id="activar-{{ producto.id }}">Activar</button>
-                {% endif %}
-            </td>
-            {% endif %}
-        </tr>
-        {% empty %}
-        <tr>
-            <td></td>
-            <td colspan="{% if tipo == 'view' %}7{% else %}8{% endif %}">Sin productos en esta clasificación.</td> 
-        </tr>
-        {% endfor %}
-*/
+function renderErrorIn(elId,errores){
+    txt = "" 
+    i = 0
+    for (var error in errores){
+        txt += "<li class='error err'>" + errores[error] + "</li>"
+        i++
+    }
+    if (i > 0){
+        $("#"+elId).after("<ul class='ajax-err messages'>" + txt + "</ul>")
+    }
+}  
+
+function chkErrores(elId) {
+
+    eraseMessages();
+
+    var x = document.getElementById(elId);
+    var valor = x.value
+    var errores = []
+    switch(elId){
+        //[via AJAX ]case "cod":
+        case "cod":
+        case "modal-cod":
+            let valor_txt = valor.replace(/\./g,"")
+            let cod_num = Number(valor_txt)
+            if (cod_num){
+                if (valor_txt.length != 8){
+                    errores.push("Código fuera de rango (mínimo 10000000, 8 dígitos)")
+                }
+            } else {
+                errores.push("Formato inválido (sólo 8 dígitos)")
+            }
+            break;
+        case "name":
+        case "modal-name":
+            if (valor.length == 0){
+                errores.push("Descripción requerida!")
+            } else if (valor.length <= 5 | valor.length > 100){
+                errores.push("Descripción debe estar entre 6 y 100 caracteres")
+            }
+            break;
+    }
+
+    if (errores.length > 0){
+        txt = "" 
+        i = 0
+        for (var error in errores){
+            txt += "<li class='error err'>" + errores[error] + "</li>"
+            i++
+        }
+        if (i > 0){
+            $("#"+elId).after("<ul class='err_"+elId+"'>" + txt + "</ul>")
+        }
+    }
+    
+}
+
+function eraseError(elId){
+    $(".err_"+elId).remove();
+}  

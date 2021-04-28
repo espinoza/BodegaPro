@@ -92,9 +92,7 @@ def gotoDashUsuarios(request):
 
     if 'id' not in request.session or not request.session['is_active']:
         return redirect('signin')
-
-    users = User.objects.all()
-
+        
     user = User.objects.get(id = request.session['id'])
 
     users = User.objects.all()
