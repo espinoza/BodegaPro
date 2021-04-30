@@ -44,33 +44,43 @@ def gotoDashboard(request, id_user, tipo):
 
         user = User.objects.get(id=request.session["id"])
 
-        all_encabezados = MovEncabezado.objects.all()
         #all_areas = getUserCreandoAreasPermitidas(user)
 
         if user.isAdmin:
             all_areas = Area.objects.filter(is_active=True).order_by('pos')
+            all_movimientos = TipoMov.objects.filter(is_active=True).order_by('pos')
         elif user.puedeSolicitar:
             all_areas = user.areas_para_solicitar.filter(is_active=True).distinct('pos').order_by('pos')
-        all_movimientos = TipoMov.objects.filter(is_active=True).order_by('pos')
+            all_movimientos = user.tipos_para_solicitar.filter(is_active=True).distinct('pos').order_by('pos')
+
+        context = {}
 
         if len(User.objects.filter(id=id_user)) > 0:
             user_dash = User.objects.get(id=id_user)
         else:
             user_dash = user
-        
-        mis_encabezados = []
-        for estado_mov in user_dash.movs_asociados.all():
-            if estado_mov.mov_encabezado not in mis_encabezados:
-                mis_encabezados.append(estado_mov.mov_encabezado)
+
+        if id_user == 0:
+            mis_o_todos = 'todos'
+            encabezados = MovEncabezado.objects.all()
+        else:
+            mis_o_todos = 'mis'
+            encabezados = []
+            for estado_mov in user_dash.movs_asociados.all():
+                if (estado_mov.user.id == user_dash.id and estado_mov.estado.name == 'CREADO' ) and \
+                     (estado_mov.mov_encabezado not in encabezados):
+                    encabezados.append(estado_mov.mov_encabezado)
+
         context = {
-            'user_dash': user_dash,
             'tipo': tipo,
             'user': user,
-            'all_encabezados': all_encabezados,
+            'user_dash' : user_dash,
+            'encabezados': encabezados,
             'all_areas': all_areas,
             'all_movimientos': all_movimientos,
-            'mis_encabezados': mis_encabezados,
+            'mis_o_todos':mis_o_todos,
         }
+
         return render(request, 'dashboard.html', context)
     return redirect("/")
 

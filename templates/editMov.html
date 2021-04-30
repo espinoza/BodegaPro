@@ -65,7 +65,9 @@
     <div class="col-md-5">
         <div class="card card-default" >
             <div class="card-header">
-                {% if user_creando or user_solicitando %}
+                {% if user_creando %}
+                    <h3>Crear movimiento</h3>
+                {% elif user_solicitando %}
                     <h3>Actualizar movimiento</h3>
                 {% else %}
                     <h3>Detalles</h3>

@@ -47,6 +47,11 @@ class MovEncabezado(models.Model):
         else:
             return 'CREADO'
 
+    @property
+    def user_crea(self):
+        return self.mov_estados.filter(estado__name = "CREADO").user
+
+
     @property 
     def num_items_solicitado(self):
         n = 0
@@ -154,6 +159,9 @@ class MovEstado(models.Model):
     nota = models.CharField(max_length=200)
     created_at = DateTimeField(auto_now_add=True)
     updated_at = DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Id.{self.id} tipo:{self.mov_encabezado.tipo_mov.name} user:{self.user.more_info.alias} estado:{self.estado.name} folio:{self.mov_encabezado.folio}"
 
 class Stock(models.Model):
     producto = models.OneToOneField(Producto,related_name="stock_data",on_delete=models.CASCADE)
