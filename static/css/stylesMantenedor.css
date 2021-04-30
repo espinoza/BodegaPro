@@ -30,5 +30,10 @@
     padding: 0px;
 }
 
-
+#btn-filter-reset{
+    background-image: url('/static/master/img/clear_filter.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
 

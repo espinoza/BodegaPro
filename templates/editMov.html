@@ -56,13 +56,13 @@
     {% endif %}
     </h3>
     </div>  
-    {% if not user_autorizando  %}
+    {% if mov_encabezado.estado == "SOLICITADO" and not user_autorizando  %}
     <h4 class="text-warning" >En espera de autorización</h4>
     {% endif %}
 {% endif %}
 
 <div class="row mb-5">
-    <div class="col">
+    <div class="col-md-5">
         <div class="card card-default" >
             <div class="card-header">
                 {% if user_creando or user_solicitando %}
@@ -91,7 +91,7 @@
         </div>
     </div>
     {% if user_solicitando %}
-    <div class="col">
+    <div class="col-md-7">
         <div class="card card-default" >
             <div class="card-header">
                 <h3>Agregue un producto</h3>

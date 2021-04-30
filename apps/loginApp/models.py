@@ -10,13 +10,21 @@ EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
 
 class UserManager(models.Manager):
 
-    def areasQue(self, tipo: str, tipo_mov, user_id): #tipo: 'solicita', 'autoriza', 'ejecuta'
-        if tipo[:3] == 'sol':
-            return self.filter(id = user_id, areas_para_solicitar__tipo_mov__name=tipo_mov)
-        elif tipo[:3] == 'aut':
-            return self.filter(id = user_id, areas_para_autorizar__tipo_mov__name=tipo_mov)
-        elif tipo[:3] == 'eje':
-            return self.filter(id = user_id, areas_para_ejecutar__tipo_mov__name=tipo_mov)
+    def areasQue(self, tipo: str, tipo_mov, user): #tipo: 'solicita', 'autoriza', 'ejecuta'
+        
+        pass
+
+        #if user.isAdmin:
+        #    print("SOY ADMIIIIIIIN")
+        #q1 = self.all()
+        #elif tipo[:3] == 'sol':
+        #    q1 = self.filter(id = user.id).areas_para_solicitar.all
+        #elif tipo[:3] == 'aut':
+        #    q1 = self.filter(id = user.id, areas_para_autorizar__tipo_mov__id=tipo_mov.id)
+        #elif tipo[:3] == 'eje':
+        #    q1 = self.filter(id = user.id, areas_para_ejecutar__tipo_mov__id=tipo_mov.id)
+
+        #return q1.filter(is_active = True).order_by('pos')
 
     def chk_pass(self, email, passwd):
         user = self.filter(email=email)

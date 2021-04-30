@@ -11,17 +11,47 @@ from django.contrib import messages
 from .utils import render_to_pdf
 from datetime import datetime
 
+#MISC
+def getUserCreandoAreasPermitidas(user: User):
 
+    pass
+
+    #if user.isAdmin:
+    #    return Area.objects.filter(is_active=True).order_by('pos')
+    #elif user.puedeSolicitar:
+    #    return user.areas_para_solicitar.filter(is_active=True).distinct('pos').order_by('pos')
+
+    tipos_mov = TipoMov.objects.filter(is_active = True).order_by('pos')
+
+    #Dict de dicts con clave tipoMov.id
+    tablaAreasXTipoMov = {}
+    for tipo_mov in tipos_mov:
+        print(tipo_mov)
+        tablaAreasXTipoMov[tipo_mov.id] = User.objects.areasQue('solicita',tipo_mov,user)
+
+    print(tablaAreasXTipoMov)
+
+    return tablaAreasXTipoMov
+
+
+#ROUTES
 def gotoDashboard(request, id_user, tipo):
+
     if "id" in request.session:
         
-        all_encabezados = MovEncabezado.objects.all()
-        all_areas = Area.objects.filter(is_active=True).order_by('pos')
-        all_movimientos = TipoMov.objects.filter(
-            is_active=True).order_by('pos')
-        print(id_user)
+        if tipo != "activemov" and tipo != 'allmov':
+            return redirect("/")
 
         user = User.objects.get(id=request.session["id"])
+
+        all_encabezados = MovEncabezado.objects.all()
+        #all_areas = getUserCreandoAreasPermitidas(user)
+
+        if user.isAdmin:
+            all_areas = Area.objects.filter(is_active=True).order_by('pos')
+        elif user.puedeSolicitar:
+            all_areas = user.areas_para_solicitar.filter(is_active=True).distinct('pos').order_by('pos')
+        all_movimientos = TipoMov.objects.filter(is_active=True).order_by('pos')
 
         if len(User.objects.filter(id=id_user)) > 0:
             user_dash = User.objects.get(id=id_user)
@@ -116,7 +146,8 @@ def createNewMov(request):
 
     context = {
         "encabezado_form": form,
-        "user_creando": True
+        "user_creando": True,
+        "user" : logged_user,
     }
     return render(request, "editMov.html", context)
 
@@ -239,6 +270,8 @@ def solicitud(request, id_mov_encabezado):
         if mov_estado_creado.user == logged_user:
             context["user_solicitando"] = True
 
+    context["user"] = logged_user
+
     return render(request, "editMov.html", context)
   
 
@@ -272,6 +305,8 @@ def autorizacion(request, id_mov_encabezado):
                 and mov_encabezado.tipo_mov in tipos_para_autorizar) or (logged_user.isAdmin):
             context["user_autorizando"] = True
 
+    context["user"] = logged_user
+
     return render(request, "editMov.html", context)
 
 
@@ -304,6 +339,8 @@ def ejecucion(request, id_mov_encabezado):
         if (mov_encabezado.area in areas_para_ejecutar
                 and mov_encabezado.tipo_mov in tipos_para_ejecutar) or (logged_user.isAdmin):
             context["user_ejecutando"] = True
+
+    context["user"] = logged_user
 
     return render(request, "editMov.html", context)
 

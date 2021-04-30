@@ -66,19 +66,50 @@ $(document).ready( function(){
         return false;
     })
 
-    $("#btn-filter-reset").click( function(){
-        $("#filter-isactive").val('1');
-        $("#filter-contains").val('')
-        $("#filter-familia").val('0')
+    $(document).on("change","[id^=filter-sel-]", function(){
         getProductos();
         return false;
     })
-    
+
+    var texto_filter_contains
+    var texto_filter_sin_espacios
+    $(document).on("focusin","#filter-contains", function(){
+        texto_filter_contains = $(this).val()
+        texto_filter_sin_espacios = 
+            texto_filter_contains.replace(/\s/g, '');
+        console.log(texto_filter_sin_espacios)
+    })
+    $(document).on("keydown","#filter-contains", function(e){
+        if (e.keyCode == 32){ 
+            if ($(this).val().replace(/\s/g, '') != texto_filter_sin_espacios){ //text has been updated
+                texto_filter_contains = $(this).val()
+                texto_filter_sin_espacios = 
+                    $(this).val().replace(/\s/g, '');
+                getProductos();
+            }
+        } else if (e.keyCode == 13) {
+              e.preventDefault();
+              return false;
+        }
+    })
+    $(document).on("focusout","#filter-contains", function(){
+        if ($(this).val() != texto_filter_contains){ //text has been updated
+            getProductos();
+        }
+    })
+
+    $("#btn-filter-reset").click( function(){
+        $("#filter-sel-isactive").val('1');
+        $("#filter-contains").val('')
+        $("#filter-sel-familia").val('0')
+        getProductos();
+        return false;
+    })
 
 })
 
 
-function getProductos(){
+function getProductos(erase_errors=true){
 
     data = $('#form-filter').serialize()
     //console.log(data)
@@ -92,7 +123,14 @@ function getProductos(){
     .done( function(response){
         
         if (response['status'] == 'OK'){
+
+            if (erase_errors){
+                eraseErrores();
+                eraseMessages();
+            }
+
             cargarProductos(response['productos']);
+
         } else {
             alert(response['status']);
         }
@@ -324,7 +362,10 @@ function chkErrores(elId) {
         if (i > 0){
             $("#"+elId).after("<ul class='err_"+elId+"'>" + txt + "</ul>")
         }
+        return true;
     }
+
+    return false;
     
 }
 
