@@ -30,6 +30,11 @@
     padding: 0px;
 }
 
+.sm-avatar{
+    width: 60px;
+    height: 60px;   
+}
+
 #btn-filter-reset{
     background-image: url('/static/master/img/clear_filter.png');
     background-size: contain;

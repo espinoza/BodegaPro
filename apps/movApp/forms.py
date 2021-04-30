@@ -49,15 +49,18 @@ class AddProductoToMovForm(forms.Form):
         cod = cleaned_data.get("cod")
         name = cleaned_data.get("name")
         if cod is None and len(name) == 0:
+            print("raise 1")
             raise forms.ValidationError(
                 "Debe ingresar código o nombre de producto"
             )
-        if cod is not None and len(name) > 0:
-            raise forms.ValidationError(
-                "Debe ingresar código o nombre, pero no ambos"
-            )
+        #if cod is not None and len(name) > 0:
+        #    print("raise 2")
+        #    raise forms.ValidationError(
+        #        "Debe ingresar código o nombre, pero no ambos"
+        #    )
         cant_solicitada = cleaned_data.get("cant_solicitada")
         if cant_solicitada == 0:
+            print("raise 3")
             raise forms.ValidationError(
                 "Debe ingresar un valor mayor que cero"
             )

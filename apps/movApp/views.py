@@ -10,6 +10,7 @@ from .forms import NewMovEncabezadoForm, EditMovEncabezadoForm, \
 from django.contrib import messages
 from .utils import render_to_pdf
 from datetime import datetime
+from BodegaPro.settings import MEDIA_URL
 
 # MISC
 
@@ -47,35 +48,43 @@ def gotoDashboard(request, id_user, tipo):
 
         user = User.objects.get(id=request.session["id"])
 
-        all_encabezados = MovEncabezado.objects.all()
         #all_areas = getUserCreandoAreasPermitidas(user)
 
         if user.isAdmin:
             all_areas = Area.objects.filter(is_active=True).order_by('pos')
+            all_movimientos = TipoMov.objects.filter(is_active=True).order_by('pos')
         elif user.puedeSolicitar:
-            all_areas = user.areas_para_solicitar.filter(
-                is_active=True).distinct('pos').order_by('pos')
-        all_movimientos = TipoMov.objects.filter(
-            is_active=True).order_by('pos')
+            all_areas = user.areas_para_solicitar.filter(is_active=True).distinct('pos').order_by('pos')
+            all_movimientos = user.tipos_para_solicitar.filter(is_active=True).distinct('pos').order_by('pos')
+
+        context = {}
 
         if len(User.objects.filter(id=id_user)) > 0:
             user_dash = User.objects.get(id=id_user)
         else:
             user_dash = user
 
-        mis_encabezados = []
-        for estado_mov in user_dash.movs_asociados.all():
-            if estado_mov.mov_encabezado not in mis_encabezados:
-                mis_encabezados.append(estado_mov.mov_encabezado)
+        if id_user == 0:
+            mis_o_todos = 'todos'
+            encabezados = MovEncabezado.objects.all()
+        else:
+            mis_o_todos = 'mis'
+            encabezados = []
+            for estado_mov in user_dash.movs_asociados.all():
+                if (estado_mov.user.id == user_dash.id and estado_mov.estado.name == 'CREADO' ) and \
+                     (estado_mov.mov_encabezado not in encabezados):
+                    encabezados.append(estado_mov.mov_encabezado)
+
         context = {
-            'user_dash': user_dash,
             'tipo': tipo,
             'user': user,
-            'all_encabezados': all_encabezados,
+            'user_dash' : user_dash,
+            'encabezados': encabezados,
             'all_areas': all_areas,
             'all_movimientos': all_movimientos,
-            'mis_encabezados': mis_encabezados,
+            'mis_o_todos':mis_o_todos,
         }
+
         return render(request, 'dashboard.html', context)
     return redirect("/")
 
@@ -233,6 +242,7 @@ def solicitud(request, id_mov_encabezado):
                 mov_encabezado.save()
 
         if "cant_solicitada" in request.POST:
+
             producto_form = AddProductoToMovForm(request.POST)
             if producto_form.is_valid():
                 cod = request.POST["cod"]
@@ -248,7 +258,10 @@ def solicitud(request, id_mov_encabezado):
                     producto_form.add_error("cod", "Producto no encontrado")
                 if len(producto) > 1:
                     context["posibles_productos"] = producto
-                if len(producto) == 1:
+
+                if len(mov_encabezado.mov_items.filter(producto=producto[0].id))>0:
+                    producto_form.add_error("cod", "Producto ya ingresado. Edite la cantidad.")
+                elif len(producto) == 1:
                     MovItem.objects.create(
                         mov_encabezado=mov_encabezado,
                         producto=producto[0],
@@ -257,7 +270,7 @@ def solicitud(request, id_mov_encabezado):
 
     initial_data = {
         "descripcion": mov_encabezado.descripcion,
-        "area": mov_encabezado.area
+        "area": mov_encabezado.area,
     }
     encabezado_form = EditMovEncabezadoForm(initial=initial_data)
 
@@ -273,6 +286,7 @@ def solicitud(request, id_mov_encabezado):
             .get(estado__name="CREADO")
         if mov_estado_creado.user == logged_user:
             context["user_solicitando"] = True
+            context['media_url'] = MEDIA_URL
 
     context["user"] = logged_user
 

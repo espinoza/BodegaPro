@@ -33,7 +33,7 @@ class MovEncabezado(models.Model):
     objects = MovManager()
 
     def __str__(self):
-        return f"Movimiento {self.id}"
+        return f"Tipo:{self.tipo_mov.name} folio:{self.folio}"
 
     @property
     def estado(self):
@@ -52,6 +52,11 @@ class MovEncabezado(models.Model):
             return 'CREADO'
 
     @property
+    def user_crea(self):
+        return self.mov_estados.filter(estado__name = "CREADO").user
+
+
+    @property 
     def num_items_solicitado(self):
         n = 0
         for fila_det in self.mov_items.all():
@@ -129,7 +134,7 @@ class MovItem(models.Model):
     updated_at = DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Item {self.producto.name} del Encabezado {self.mov_encabezado.id} {self.mov_encabezado.estado}"
+        return f"Producto:{self.producto.name} folio:{self.mov_encabezado.folio} tipo:{self.mov_encabezado.tipo_mov.name}"
 
     @property
     def monto_solicitado(self):
@@ -168,7 +173,7 @@ class MovEstado(models.Model):
     updated_at = DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.id} {self.estado}"
+        return f"Id.{self.id} tipo:{self.mov_encabezado.tipo_mov.name} user:{self.user.more_info.alias} estado:{self.estado.name} folio:{self.mov_encabezado.folio}"
 
 
 class Stock(models.Model):
