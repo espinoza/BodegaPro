@@ -277,6 +277,73 @@ def gotoMov(request, id_mov_encabezado):
 
     return render(request, "editMov.html", context)
 
+####AJAX para eliminar y editar######
+
+def ajaxDelItem(request,id_mov_encabezado):
+    if 'id' not in request.session or not request.session['is_active']:
+        return redirect('signin')
+
+    try:
+        movimiento = MovEncabezado.objects.get(id=id_mov_encabezado)
+    except:
+        return redirect('dashboard')
+
+    #Sólo se cambia cuando el estado es CREADO y por ese usuario
+    if movimiento.estado != "CREADO" or request.session['id'] != movimiento.user_crea.id:
+        return redirect('dashboard')
+
+    try:
+        item = MovItem.objects.filter(id=request.POST["id_item"])[0]
+        nombre_item = item.producto.name
+    except:
+        return redirect('dashboard')
+    item.delete()
+
+    response = {}
+    response['status'] = "OK"
+    response['message'] = f"Producto { nombre_item } descartado de la solicitud."
+
+    return JsonResponse(response)
+
+
+def ajaxEditItem(request,id_mov_encabezado):
+    if 'id' not in request.session or not request.session['is_active']:
+        return redirect('signin')
+
+    #Faltan permisos!!
+
+    try:
+        movimiento = MovEncabezado.objects.get(id=id_mov_encabezado)
+    except:
+        return redirect('dashboard')
+
+    try:
+        item = MovItem.objects.filter(id=request.POST["id_item"])[0]
+        nombre_item = item.producto.name
+    except:
+        return redirect('dashboard')
+
+    if movimiento.estado == "CREADO":
+        item.cant_solicitada = request.POST["quantity"]
+        tipo = 'solicitada'
+    elif movimiento.estado == "SOLICITADO":
+        item.cant_autorizada = request.POST["quantity"]
+        tipo = 'autorizada'
+    elif movimiento.estado == "AUTORIZADO":
+        item.cant_ejecutada = request.POST["quantity"]
+        tipo = 'ejecutada'
+    item.save()    
+
+    response = {}
+    response['status'] = "OK"
+    response['message'] = f"Cantidad { tipo }, { nombre_item } editada!"
+
+    return JsonResponse(response)
+
+
+#######
+
+
 
 def eliminarItem(request, id_mov_encabezado):
     # NOTE: Falta no permitir que otro usuario modifique el formulario
