@@ -11,23 +11,25 @@ import os
 
 from django.core.files.storage import FileSystemStorage
 
-#CRUD
+# CRUD
+
 
 def getUnidadesDB():
-    return UnidadMedida.objects.filter(is_active = True)
+    return UnidadMedida.objects.filter(is_active=True)
+
 
 def getFamiliasDB():
-    return Familia.objects.filter(is_active = True )
+    return Familia.objects.filter(is_active=True)
 
 
-def updateProductoDB(post_data,file_data):
+def updateProductoDB(post_data, file_data):
 
     id_prod = int(post_data['id'])
     try:
-        producto = Producto.objects.get(id = id_prod)
+        producto = Producto.objects.get(id=id_prod)
     except:
         return False
-    
+
     if "cod" in post_data:
         producto.cod = post_data['cod']
 
@@ -36,51 +38,51 @@ def updateProductoDB(post_data,file_data):
 
     if "unidad_medida" in post_data:
         producto.unidad_medida = \
-            UnidadMedida.objects.get(id = int(post_data['unidad_medida']))
+            UnidadMedida.objects.get(id=int(post_data['unidad_medida']))
 
     if "familia" in post_data:
-        producto.familia= \
-            Familia.objects.get(id = int(post_data['familia']))
+        producto.familia = \
+            Familia.objects.get(id=int(post_data['familia']))
 
     if len(file_data) > 0:
-        addImageToProd(producto,file_data,'update')
+        addImageToProd(producto, file_data, 'update')
 
     producto.save()
 
     return producto
 
 
-def addProductoToDB(post_data,file_data):
+def addProductoToDB(post_data, file_data):
 
-    unidad_medida = UnidadMedida.objects.get(id = int(post_data['unidad_medida']))
-    familia = Familia.objects.get(id = int(post_data['familia']))
+    unidad_medida = UnidadMedida.objects.get(
+        id=int(post_data['unidad_medida']))
+    familia = Familia.objects.get(id=int(post_data['familia']))
 
     producto = Producto.objects.create(
-        cod = int(post_data['cod']),
-        name = post_data['name'].upper(),
-        unidad_medida = unidad_medida,
-        familia = familia,
+        cod=int(post_data['cod']),
+        name=post_data['name'].upper(),
+        unidad_medida=unidad_medida,
+        familia=familia,
         #img_url = fileName,
     )
 
-    addImageToProd(producto,file_data)
+    addImageToProd(producto, file_data)
     producto.save()
 
-    #Crear Stock
+    # Crear Stock
     Stock.objects.create(
-        producto = producto,
+        producto=producto,
     )
 
     return producto
 
 
+# MISC
 
-#MISC
+def addImageToProd(producto: Producto, file_data, tipo='new'):
 
-def addImageToProd(producto: Producto,file_data,tipo='new'):
-
-    #Manejo del Archivo
-    #1. borrar archivos preexistentes
+    # Manejo del Archivo
+    # 1. borrar archivos preexistentes
     folderName = "media/" + str(producto.id)
     folderPath = os.path.join(folderName)
     if os.path.exists(folderPath):
@@ -91,14 +93,15 @@ def addImageToProd(producto: Producto,file_data,tipo='new'):
                     print(f"file {f} removed!")
                 except:
                     pass
-    
+
     if len(file_data) > 0:
-        sistemaArchivos = FileSystemStorage('media/' + str(producto.id)) 
+        sistemaArchivos = FileSystemStorage('media/' + str(producto.id))
         archivoCargado = file_data['img_url']
         extension = archivoCargado.name.lower().split('.')[-1]
-        prefix = str(datetime.now()).replace(' ','H').replace('-','R').replace(':','D').replace('.','P')
+        prefix = str(datetime.now()).replace(' ', 'H').replace(
+            '-', 'R').replace(':', 'D').replace('.', 'P')
         fileName = f"{prefix}__{producto.cod}.{extension}"
-        miArchivo = sistemaArchivos.save(fileName,archivoCargado)
+        miArchivo = sistemaArchivos.save(fileName, archivoCargado)
         producto.img_url = f"{producto.id}/{fileName}"
     elif tipo == 'new':
         fileName = '00000000.png'
@@ -113,16 +116,17 @@ def addImageToProd(producto: Producto,file_data,tipo='new'):
 
 def getProductoJson(producto):
     return {
-        'id'            : producto.id,
-        'img_url'       : f"{MEDIA_URL}{producto.img_url}",
-        'cod'           : producto.cod,
-        'name'          : producto.name,
-        'cantidad'      : producto.cantidad,
-        'unidad_medida' : producto.unidad_medida.name,
-        'familia'       : producto.familia.name, 
-        'precio_unit'   : producto.precio_unit,
-        'is_active'     : producto.is_active,
+        'id': producto.id,
+        'img_url': f"{MEDIA_URL}{producto.img_url}",
+        'cod': producto.cod,
+        'name': producto.name,
+        'cantidad': producto.cantidad,
+        'unidad_medida': producto.unidad_medida.name,
+        'familia': producto.familia.name,
+        'precio_unit': producto.precio_unit,
+        'is_active': producto.is_active,
     }
+
 
 def productsToJson(filteredProducts):
     prodsJson = {}
@@ -131,12 +135,12 @@ def productsToJson(filteredProducts):
     return prodsJson
 
 
-def prodFilter(isactive=1,familia=0,wordSet={}):
+def prodFilter(isactive=1, familia=0, wordSet={}):
 
     if isactive == 1:
-        q1 = Producto.objects.filter(is_active = True).order_by('name')
+        q1 = Producto.objects.filter(is_active=True).order_by('name')
     elif isactive == -1:
-        q1 = Producto.objects.filter(is_active = False).order_by('name')
+        q1 = Producto.objects.filter(is_active=False).order_by('name')
     else:
         q1 = Producto.objects.all().order_by('name')
 
@@ -154,17 +158,17 @@ def prodFilter(isactive=1,familia=0,wordSet={}):
     return q1
 
 
-#ROUTES
+# ROUTES
 def gotoProductos(request):
-    user = User.objects.get(id = request.session['id'])
+    user = User.objects.get(id=request.session['id'])
     context = {
-        'tipo' : 'view', 
-        'user' : user,
-        #'productos' : Producto.objects.filter(is_active = True),
-        'familias' : getFamiliasDB(),
-        'media_url' : MEDIA_URL,
+        'tipo': 'view',
+        'user': user,
+        # 'productos' : Producto.objects.filter(is_active = True),
+        'familias': getFamiliasDB(),
+        'media_url': MEDIA_URL,
     }
-    return render(request,'productos.html',context)
+    return render(request, 'productos.html', context)
 
 
 def editProductos(request):
@@ -172,19 +176,19 @@ def editProductos(request):
     if 'id' not in request.session or not request.session['is_active']:
         return redirect('signin')
 
-    user = User.objects.get(id = request.session['id'])
+    user = User.objects.get(id=request.session['id'])
     if not user.isAdmin:
         return redirect('viewpproductos')
 
     context = {
-        'tipo' : 'edit',
-        'user' : user,
-        'unidades' : getUnidadesDB(),
-        'familias' : getFamiliasDB(),
-        #'productos' : Producto.objects.all(),
-        'media_url' : MEDIA_URL,
+        'tipo': 'edit',
+        'user': user,
+        'unidades': getUnidadesDB(),
+        'familias': getFamiliasDB(),
+        # 'productos' : Producto.objects.all(),
+        'media_url': MEDIA_URL,
     }
-    return render(request,'productos.html',context)
+    return render(request, 'productos.html', context)
 
 
 def updateProduct(request):
@@ -192,7 +196,7 @@ def updateProduct(request):
     if 'id' not in request.session or not request.session['is_active']:
         return redirect('signin')
 
-    user = User.objects.get(id = request.session['id'])
+    user = User.objects.get(id=request.session['id'])
     if not user.isAdmin:
         return redirect('dashboard')
 
@@ -203,10 +207,10 @@ def updateProduct(request):
         errors = Producto.objects.producto_validator(request.POST)
 
         if len(request.FILES) > 0 and not Producto.objects.is_valid_file_extension(request.FILES):
-                errors['img_url'] = "Formato de archivo inválido (de ser .jpg, .png, .jpeg, .gif)"
+            errors['img_url'] = "Formato de archivo inválido (de ser .jpg, .png, .jpeg, .gif)"
 
         if len(errors) > 0:
-            
+
             response['errores'] = errors
             response['status'] = 'error'
 
@@ -214,25 +218,26 @@ def updateProduct(request):
 
         else:
 
-            producto = updateProductoDB(request.POST,request.FILES)
+            producto = updateProductoDB(request.POST, request.FILES)
 
             response = {
-                'status'        : 'OK',
-                'product'       : getProductoJson(producto),
+                'status': 'OK',
+                'product': getProductoJson(producto),
             }
 
             return JsonResponse(response)
 
     else:
 
-        return redirect('viewproductos') 
+        return redirect('viewproductos')
+
 
 def newProduct(request):
 
     if 'id' not in request.session or not request.session['is_active']:
         return redirect('signin')
 
-    user = User.objects.get(id = request.session['id'])
+    user = User.objects.get(id=request.session['id'])
     if not user.isAdmin:
         return redirect('dashboard')
 
@@ -241,11 +246,11 @@ def newProduct(request):
         errors = Producto.objects.producto_validator(request.POST)
 
         if len(request.FILES) > 0 and not Producto.objects.is_valid_file_extension(request.FILES):
-                errors['img_url'] = "Formato de archivo inválido (de ser .jpg, .png, .jpeg, .gif)"
+            errors['img_url'] = "Formato de archivo inválido (de ser .jpg, .png, .jpeg, .gif)"
 
         if len(errors) > 0:
             for key, value in errors.items():
-                messages.error(request, value) 
+                messages.error(request, value)
 
             producto = Producto(
                 cod=request.POST['cod'],
@@ -253,30 +258,32 @@ def newProduct(request):
             )
 
             if 'unidad_medida' in request.POST:
-                producto.unidad_medida = UnidadMedida.objects.get(id = int(request.POST['unidad_medida']))
+                producto.unidad_medida = UnidadMedida.objects.get(
+                    id=int(request.POST['unidad_medida']))
 
             if 'familia' in request.POST:
-                producto.familia = Familia.objects.get(id = int(request.POST['familia']))
+                producto.familia = Familia.objects.get(
+                    id=int(request.POST['familia']))
 
             context = {
-                'tipo' : 'edit',
-                'user' : user,
-                'new_product' : producto,
-                'unidades' : getUnidadesDB(),
-                'familias' : getFamiliasDB(),
-                'productos' : Producto.objects.all(),
-                'media_url' : MEDIA_URL,
+                'tipo': 'edit',
+                'user': user,
+                'new_product': producto,
+                'unidades': getUnidadesDB(),
+                'familias': getFamiliasDB(),
+                'productos': Producto.objects.all(),
+                'media_url': MEDIA_URL,
             }
 
-            return render(request,'productos.html',context)
+            return render(request, 'productos.html', context)
 
-        
         else:
 
-            producto = addProductoToDB(request.POST,request.FILES)
+            producto = addProductoToDB(request.POST, request.FILES)
 
-            messages.success(request, f"Producto {producto.cod} {producto.name} creado!")
-            
+            messages.success(
+                request, f"Producto {producto.cod} {producto.name} creado!")
+
             return redirect('editproductos')
 
     else:
@@ -284,17 +291,16 @@ def newProduct(request):
         return redirect('viewproductos')
 
 
-
-def toggleItemProducto(request): #AJAX
+def toggleItemProducto(request):  # AJAX
 
     if 'id' not in request.session or not request.session['is_active']:
         return redirect('signin')
 
-    if User.objects.get(id = request.session['id']).isAdmin and request.method == "POST":
+    if User.objects.get(id=request.session['id']).isAdmin and request.method == "POST":
 
         response = {}
 
-        productos = Producto.objects.filter(id = int(request.POST['id']))
+        productos = Producto.objects.filter(id=int(request.POST['id']))
 
         if len(productos) > 0:
             producto: Producto = productos[0]
@@ -303,21 +309,20 @@ def toggleItemProducto(request): #AJAX
             else:
                 is_active = True
 
-            #update is_active
+            # update is_active
             producto.is_active = is_active
             producto.save()
 
             response = {
-                'status'        : 'OK',
-                'product'       : getProductoJson(producto),
+                'status': 'OK',
+                'product': getProductoJson(producto),
             }
 
         else:
             response['status'] = "Id del producto no encontrado!"
-            
+
         print(request.META.get('HTTP_X_FORWARDED_FOR'))
         print(request.META.get("REMOTE_ADDR"))
-        
 
         return JsonResponse(response)
 
@@ -334,7 +339,7 @@ def getFilteredProducts(request):
     response = {}
 
     if request.method == "POST":
-        
+
         print(request.POST)
 
         if "isactive" in request.POST:
@@ -357,7 +362,7 @@ def getFilteredProducts(request):
         print(contiene)
         print(familias)
 
-        filteredProducts = prodFilter(isactive,familias,contiene)
+        filteredProducts = prodFilter(isactive, familias, contiene)
         jsonProducts = productsToJson(filteredProducts)
 
         response['status'] = "OK"
@@ -366,5 +371,23 @@ def getFilteredProducts(request):
     else:
 
         response["status"] = "error: ruta inhabilitada"
-    
+
     return JsonResponse(response)
+
+
+def Grafico(request):
+    productos_con_stock = Stock.objects.filter(monto_total__gt=0)
+    data_series = []
+    data_stock = []
+    data_monto = []
+    for p in productos_con_stock:
+
+        data_series.append(str(p.producto.cod) + "-" + p.producto.name)
+        data_stock.append(p.cantidad)
+        data_monto.append(p.monto_total)
+    context = {
+        'data_series': data_series,
+        'data_stock': data_stock,
+        'data_monto': data_monto
+    }
+    return render(request, 'grafico.html', context)
