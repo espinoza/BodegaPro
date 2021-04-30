@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from apps.loginApp.models import User
 from .models import MovEncabezado, MovItem, MovEstado, MovEncabezado, Stock
 from .forms import NewMovEncabezadoForm, EditMovEncabezadoForm, \
-    AddProductoToMovForm
+    AddProductoToMovForm, AddProductoEntradaToMovForm
 from django.contrib import messages
 from .utils import render_to_pdf
 from datetime import datetime
@@ -193,7 +193,11 @@ def gotoMov(request, id_mov_encabezado):
     context = {}
     if mov_encabezado.estado == "CREADO":
 
-        producto_form = AddProductoToMovForm()
+        print(mov_encabezado.tipo_mov.name)
+        if mov_encabezado.tipo_mov.name == "ENTRADA":
+            producto_form = AddProductoEntradaToMovForm()
+        if mov_encabezado.tipo_mov.name == "SALIDA":
+            producto_form = AddProductoToMovForm()
 
         if request.method == "POST":
 
@@ -206,7 +210,11 @@ def gotoMov(request, id_mov_encabezado):
 
             if "cant_solicitada" in request.POST:
 
-                producto_form = AddProductoToMovForm(request.POST)
+                if mov_encabezado.tipo_mov.name == "ENTRADA":
+                    producto_form = AddProductoEntradaToMovForm(request.POST)
+                if mov_encabezado.tipo_mov.name == "SALIDA":
+                    producto_form = AddProductoToMovForm(request.POST)
+
                 if producto_form.is_valid():
                     cod = request.POST["cod"]
                     name = request.POST["name"]
@@ -230,10 +238,16 @@ def gotoMov(request, id_mov_encabezado):
                             "cod", "Producto ya ingresado. Edite la cantidad."
                         )
                     elif len(producto) == 1:
+                        if mov_encabezado.tipo_mov.name == "ENTRADA":
+                            precio_unit = request.POST["precio_unit"]
+                        if mov_encabezado.tipo_mov.name == "SALIDA":
+                            precio_unit = producto[0].precio_unit
+
                         MovItem.objects.create(
                             mov_encabezado=mov_encabezado,
                             producto=producto[0],
-                            cant_solicitada=request.POST["cant_solicitada"]
+                            cant_solicitada=request.POST["cant_solicitada"],
+                            precio_unit=precio_unit
                         )
 
         initial_data = {

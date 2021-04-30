@@ -65,3 +65,16 @@ class AddProductoToMovForm(forms.Form):
                 "Debe ingresar un valor mayor que cero"
             )
         return cleaned_data
+
+
+class AddProductoEntradaToMovForm(AddProductoToMovForm):
+
+    precio_unit = forms.FloatField()
+
+    def clean(self):
+        cleaned_data = super(AddProductoEntradaToMovForm, self).clean()
+        precio_unit = cleaned_data.get("precio_unit")
+        if precio_unit < 0:
+            raise forms.ValidationError(
+                "Debe ingresar un valor mayor que cero"
+            )
