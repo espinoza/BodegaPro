@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extraStyles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/stylesMantenedor.css' %}"/> 
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+{% endblock %}
+
+{% block title %}BodegaPro - Gráfico Stock{% endblock %}
+
+{% block extraScripts %}
+<script src="{% static 'js/functionsProductos.js' %}"></script>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <figure class="highcharts-figure">
+                <div id="container"></div>
+               
+            </figure>
+    
+        </div>
+    </div>
+</div>
+
+<script type="application/javascript">
+Highcharts.chart('container', {
+    chart: {
+        zoomType: 'xy'
+    },
+    title: {
+        text: 'Cantidad y monto total de productos con stock'
+    },
+    subtitle: {
+        text: 'Se excluye de informe los productos sin stock'
+    },
+    xAxis: [{
+        categories: {{data_series|safe}}
+        
+    }],
+    yAxis: [{ // Primary yAxis
+        labels: {
+            format: '${value}',
+            style: {
+                color: Highcharts.getOptions().colors[1]
+            }
+        },
+        title: {
+            text: 'Monto Total',
+            style: {
+                color: Highcharts.getOptions().colors[1]
+            }
+        }
+    }, { // Secondary yAxis
+        title: {
+            text: 'Cantidad',
+            style: {
+                color: Highcharts.getOptions().colors[0]
+            }
+        },
+        labels: {
+            format: '{value}',
+            style: {
+                color: Highcharts.getOptions().colors[0]
+            }
+        },
+        opposite: true
+    }],
+    tooltip: {
+        shared: true
+    },
+    legend: {
+        layout: 'vertical',
+        align: 'left',
+        x: 120,
+        verticalAlign: 'top',
+        y: 100,
+        floating: true,
+        backgroundColor:
+            Highcharts.defaultOptions.legend.backgroundColor || // theme
+            'rgba(255,255,255,0.25)'
+    },
+    series: [{
+        name: 'Cantidad',
+        type: 'column',
+        yAxis: 1,
+        data: {{data_stock}},
+        tooltip: {
+            valueSuffix: ''
+        }
+
+    }, {
+        name: 'Monto total',
+        type: 'column',
+        data: {{data_monto}},
+        tooltip: {
+            valueSuffix: '$'
+        }
+    }]
+});
+</script>
+
+{% endblock %}

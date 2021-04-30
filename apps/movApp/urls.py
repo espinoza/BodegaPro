@@ -31,4 +31,6 @@ urlpatterns = [
          views.sacarPDFstock, name='generar_pdf_stock'),
     path('PDF/SinStock/',
          views.sacarPDFSinstock, name='generar_pdf_sin_stock'),
+    path('harry/<int:id_mov_encabezado>/',
+         views.modificando_stock, name="modificando_stock"),
 ]
