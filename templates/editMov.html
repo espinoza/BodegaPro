@@ -142,10 +142,10 @@
             <th scope="col" style="width:40%">Descripción</th>
             <th scope="col" style="width:8%">Cant. Solicitada</th>
             <th scope="col" style="width:8%">Un</th>
-            {%if mov_encabezado.estado == "SOLICITADO" or mov_encabezado.estado == "AUTORIZADO" %}
+            {%if mov_encabezado.estado == "SOLICITADO" or mov_encabezado.estado == "AUTORIZADO" or mov_encabezado.estado == "EJECUTADO" %}
                 <th scope="col" style="width:8%">Cant. Autorizada</th>
             {%endif%}
-            {%if mov_encabezado.estado == "AUTORIZADO"%}
+            {%if mov_encabezado.estado == "AUTORIZADO" or mov_encabezado.estado == "EJECUTADO" %}
                 <th scope="col" style="width:8%">Cant. Concretada</th>
             {%endif%}
             <th scope="col" style="width:8%">$ Unit</th>
@@ -165,10 +165,10 @@
             <td scope="col">{{ mov_item.producto.name }}</td>
             <td scope="col">{{ mov_item.cant_solicitada}}</td>
             <td scope="col">{{ mov_item.producto.unidad_medida.name }}</td>
-            {%if mov_encabezado.estado == "SOLICITADO" or mov_encabezado.estado == "AUTORIZADO" %}
+            {%if mov_encabezado.estado == "SOLICITADO" or mov_encabezado.estado == "AUTORIZADO" or mov_encabezado.estado == "EJECUTADO" %}
                 <td scope="col">{% if mov_item.cant_autorizada == None %} 0 {%else%} {{ mov_item.cant_autorizada }} {%endif%}</td>
             {%endif%}
-            {%if mov_encabezado.estado == "AUTORIZADO"%}
+            {%if mov_encabezado.estado == "AUTORIZADO" or mov_encabezado.estado == "EJECUTADO" %}
                 <td scope="col">{% if mov_item.cant_ejecutada == None %} 0 {%else%} {{ mov_item.cant_ejecutada }} {%endif%}</td>
             {%endif%}
             <td scope="col">{{ mov_item.producto.precio_unit }}</td>
