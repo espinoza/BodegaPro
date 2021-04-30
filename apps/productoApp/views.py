@@ -375,7 +375,11 @@ def getFilteredProducts(request):
     return JsonResponse(response)
 
 
-def Grafico(request):
+def GraficoStockMonto(request):
+
+    if 'id' not in request.session or not request.session['is_active']:
+        return redirect('signin')
+
     productos_con_stock = Stock.objects.filter(monto_total__gt=0)
     data_series = []
     data_stock = []
@@ -388,6 +392,7 @@ def Grafico(request):
     context = {
         'data_series': data_series,
         'data_stock': data_stock,
-        'data_monto': data_monto
+        'data_monto': data_monto,
+        'user': User.objects.get(id = request.session['id']),
     }
     return render(request, 'grafico.html', context)
