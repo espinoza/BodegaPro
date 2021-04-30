@@ -14,6 +14,18 @@ $(document).on("click", "[id^=btn-item-choose-]", function(){
     return false;
 });
 
+$(document).on("click", "[id^=btn-del-item-]", function(){
+    let id = $(this).attr('id').substring(13);
+    delItem(id);
+    return false;
+})
+
+$(document).on("click", "[id^=btn-edit-item-]", function(){
+    let id = $(this).attr('id').substring(14);
+    editItem(id);
+    return false;
+})
+
 $(document).ready( function(){
 
     var miEl = document.getElementById("movprodModal")
@@ -34,6 +46,79 @@ $(document).ready( function(){
     $("ul.errorlist li").css('color','red');
 
 })
+
+function editItem(id_item){
+
+    let data = $(`#form-edit-item-${id_item}`).serialize();
+    let id_encabezado = $('#mov-encabezado-id').val();
+
+    $.ajax({
+        type:"POST",
+        url: `/movs/view/${id_encabezado}/item/edit`,
+        data: data,
+        dataType:"JSON",
+    })
+    .done( function(response){
+        
+        if (response['status'] == 'OK'){
+
+            $(`#btn-edit-item-${id_item}`).css('color','yellow')
+            setTimeout(function () {
+                $(`#btn-edit-item-${id_item}`).css('color','white')
+            }, 2000);
+            
+            console.log(response['message'])
+
+        } else {
+            alert(response['status']);
+        }
+
+    })
+    .fail( function(){
+        alert("FALLA...")
+    })
+    .always( function(response){
+        
+    })
+
+}
+
+function delItem(id_item){
+
+    let data = $(`#form-del-item-${id_item}`).serialize()
+
+    $.ajax({
+        type:"POST",
+        url: 'item/delete',
+        data: data,
+        dataType:"JSON",
+    })
+    .done( function(response){
+        
+        if (response['status'] == 'OK'){
+
+            removeItem(id_item)
+            setTimeout(function () {
+                alert(response['message']);
+            }, 500);
+
+        } else {
+            alert(response['status']);
+        }
+
+    })
+    .fail( function(){
+        alert("FALLA...")
+    })
+    .always( function(response){
+        
+    })
+
+}
+
+function removeItem(id_item){
+    $(`#tr-item-${id_item}`).remove();
+}
 
 function getProductos(){
 

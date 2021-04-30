@@ -21,6 +21,10 @@ urlpatterns = [
          views.ejecucion, name='ejecucion'),
     path('view/<int:id_mov_encabezado>/eliminarItem',
          views.eliminarItem, name='delete_item'),
+    path('solicitud/<int:id_mov_encabezado>/item/delete',
+         views.ajaxDelItem, name='ajax_delete_item'), #AJAX
+    path('view/<int:id_mov_encabezado>/item/edit',
+         views.ajaxEditItem, name='ajax_edit_item'), #AJAX
     path('view/<int:id_mov_encabezado>/editarItem',
          views.editarItem, name='edit_item'),
     path('view/<int:id_mov_encabezado>/cambiarEstado',

@@ -53,7 +53,7 @@ class MovEncabezado(models.Model):
 
     @property
     def user_crea(self):
-        return self.mov_estados.filter(estado__name = "CREADO").user
+        return self.mov_estados.filter(estado__name = "CREADO")[0].user
 
 
     @property 
