@@ -38,6 +38,12 @@
         <input type="hidden" name="id_mov" value="{{mov_encabezado.id}}">
         <button class=" btn btn-success h-red mg-auto" id="btn-add-item"><i class="far fa-check-circle"></i> AUTORIZAR </button>
     </form>    
+    <form  method = 'POST' action="{% url 'change_status' mov_encabezado.id %}">
+        {% csrf_token %}  
+        <input type="hidden" name="new_status" value="NO AUTORIZADO">
+        <input type="hidden" name="id_mov" value="{{mov_encabezado.id}}">
+        <button class=" btn btn-danger h-red mg-auto" id="btn-add-item"><i class="far fa-angle-double-up"></i> NO AUTORIZAR </button>
+    </form>
 {% elif mov_encabezado.estado == 'AUTORIZADO' and user_ejecutando %}
     <form  method = 'POST' action="{% url 'change_status' mov_encabezado.id %}">
         {% csrf_token %}  
@@ -142,13 +148,19 @@
             <th scope="col" style="width:40%">Descripción</th>
             <th scope="col" style="width:8%">Cant. Solicitada</th>
             <th scope="col" style="width:8%">Un</th>
-            {%if mov_encabezado.estado == "SOLICITADO" or mov_encabezado.estado == "AUTORIZADO" %}
+            {%if mov_encabezado.estado == "SOLICITADO" or mov_encabezado.estado == "AUTORIZADO" or mov_encabezado.estado == "EJECUTADO" %}
                 <th scope="col" style="width:8%">Cant. Autorizada</th>
             {%endif%}
-            {%if mov_encabezado.estado == "AUTORIZADO"%}
+            {%if mov_encabezado.estado == "AUTORIZADO" or mov_encabezado.estado == "EJECUTADO" %}
                 <th scope="col" style="width:8%">Cant. Concretada</th>
             {%endif%}
-            <th scope="col" style="width:8%">$ Unit</th>
+            {% if mov_encabezado.abierto %}
+                <th scope="col" style="width:8%">$ Unit</th>
+                <th scope="col">Stock</th>
+            {% else %}
+                <th scope="col" style="width:8%">$ Unit histórico</th>
+                <th scope="col">Stock histórico</th>
+            {% endif %}
             {% if user_solicitando or user_autorizando or user_ejecutando %}
             <th scope="col">Editar</th>
             {% endif %}
@@ -157,24 +169,30 @@
             {% endif %}
         </tr>
     </thead>
-    {% for mov_item in mov_encabezado.mov_items_sorted_updated.all %}
     <tbody>
+    {% for mov_item in mov_encabezado.mov_items_sorted_updated.all %}
         <tr id="tr-item-{{ mov_item.id }}">
-        <!--tr id="tr-{{ mov_item.producto.id }}"-->
+        <!--tr id="tr-{{ mov_item.producto.id }}"-->  
             <td scope="col"><img class="avatar" src="/media/{{ mov_item.producto.img_url }}" alt="Prod Img"></td>
             <td scope="col">{{ mov_item.producto.cod }}</td>
             <td scope="col">{{ mov_item.producto.name }}</td>
             <td scope="col">{{ mov_item.cant_solicitada}}</td>
             <td scope="col">{{ mov_item.producto.unidad_medida.name }}</td>
-            {%if mov_encabezado.estado == "SOLICITADO" or mov_encabezado.estado == "AUTORIZADO" %}
+            {%if mov_encabezado.estado == "SOLICITADO" or mov_encabezado.estado == "AUTORIZADO" or mov_encabezado.estado == "EJECUTADO" %}
                 <td scope="col">{% if mov_item.cant_autorizada == None %} 0 {%else%} {{ mov_item.cant_autorizada }} {%endif%}</td>
             {%endif%}
-            {%if mov_encabezado.estado == "AUTORIZADO"%}
+            {%if mov_encabezado.estado == "AUTORIZADO" or mov_encabezado.estado == "EJECUTADO" %}
                 <td scope="col">{% if mov_item.cant_ejecutada == None %} 0 {%else%} {{ mov_item.cant_ejecutada }} {%endif%}</td>
             {%endif%}
-            <td scope="col">{{ mov_item.producto.precio_unit }}</td>
-            <!--td scope="col">{% if mov_item.precio_unit == None %} 0 {%else%} {{ mov_item.precio_unit }} {%endif%}</td-->
 
+            {% if mov_encabezado.abierto %}
+                <td scope="col">{{ mov_item.producto.precio_unit }}</td>
+                <!--td scope="col">{% if mov_item.precio_unit == None %} 0 {%else%} {{ mov_item.precio_unit }} {%endif%}</td-->
+                <td>{{mov_item.producto.stock_data.cantidad}}</td>
+            {% else %}
+                <td scope="col">{{ mov_item.precio_unit }}</td>
+                <td scope="col">{{mov_item.stock_antes_de_cerrar}}</td>
+            {% endif %}
             {% if user_solicitando or user_autorizando or user_ejecutando %}
             <td scope="col">
                 <form class="form-inline"  method='POST' action="" id="form-edit-item-{{ mov_item.id }}" {#% url 'edit_item' mov_encabezado.id %#}">
@@ -198,13 +216,13 @@
             </td>
             {% endif %}
         </tr>
-    </tbody>
     {% empty %}
         <tr>
             <td></td>
             <td colspan="7"><p>No hay productos en la lista</p></td>
         </tr>
     {% endfor %}
+    </tbody>
 </table>
 
 <input type="hidden" id="mov-encabezado-id" value="{{mov_encabezado.id}}">
