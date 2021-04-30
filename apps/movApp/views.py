@@ -6,39 +6,42 @@ from django.shortcuts import render, redirect
 from apps.loginApp.models import User
 from .models import MovEncabezado, MovItem, MovEstado, MovEncabezado, Stock
 from .forms import NewMovEncabezadoForm, EditMovEncabezadoForm, \
-                   AddProductoToMovForm
+    AddProductoToMovForm
 from django.contrib import messages
 from .utils import render_to_pdf
 from datetime import datetime
 
-#MISC
+# MISC
+
+
 def getUserCreandoAreasPermitidas(user: User):
 
     pass
 
-    #if user.isAdmin:
+    # if user.isAdmin:
     #    return Area.objects.filter(is_active=True).order_by('pos')
-    #elif user.puedeSolicitar:
+    # elif user.puedeSolicitar:
     #    return user.areas_para_solicitar.filter(is_active=True).distinct('pos').order_by('pos')
 
-    tipos_mov = TipoMov.objects.filter(is_active = True).order_by('pos')
+    tipos_mov = TipoMov.objects.filter(is_active=True).order_by('pos')
 
-    #Dict de dicts con clave tipoMov.id
+    # Dict de dicts con clave tipoMov.id
     tablaAreasXTipoMov = {}
     for tipo_mov in tipos_mov:
         print(tipo_mov)
-        tablaAreasXTipoMov[tipo_mov.id] = User.objects.areasQue('solicita',tipo_mov,user)
+        tablaAreasXTipoMov[tipo_mov.id] = User.objects.areasQue(
+            'solicita', tipo_mov, user)
 
     print(tablaAreasXTipoMov)
 
     return tablaAreasXTipoMov
 
 
-#ROUTES
+# ROUTES
 def gotoDashboard(request, id_user, tipo):
 
     if "id" in request.session:
-        
+
         if tipo != "activemov" and tipo != 'allmov':
             return redirect("/")
 
@@ -50,14 +53,16 @@ def gotoDashboard(request, id_user, tipo):
         if user.isAdmin:
             all_areas = Area.objects.filter(is_active=True).order_by('pos')
         elif user.puedeSolicitar:
-            all_areas = user.areas_para_solicitar.filter(is_active=True).distinct('pos').order_by('pos')
-        all_movimientos = TipoMov.objects.filter(is_active=True).order_by('pos')
+            all_areas = user.areas_para_solicitar.filter(
+                is_active=True).distinct('pos').order_by('pos')
+        all_movimientos = TipoMov.objects.filter(
+            is_active=True).order_by('pos')
 
         if len(User.objects.filter(id=id_user)) > 0:
             user_dash = User.objects.get(id=id_user)
         else:
             user_dash = user
-        
+
         mis_encabezados = []
         for estado_mov in user_dash.movs_asociados.all():
             if estado_mov.mov_encabezado not in mis_encabezados:
@@ -83,7 +88,7 @@ def requestNewMov(request):
             if user:
                 logged_user = user[0]
                 if ("area" not in request.POST
-                    or "tipo_mov" not in request.POST):
+                        or "tipo_mov" not in request.POST):
                     return redirect("/movs/0/activemov")
                 area_id = request.POST["area"]
                 tipo_mov_id = request.POST["tipo_mov"]
@@ -147,7 +152,7 @@ def createNewMov(request):
     context = {
         "encabezado_form": form,
         "user_creando": True,
-        "user" : logged_user,
+        "user": logged_user,
     }
     return render(request, "editMov.html", context)
 
@@ -175,14 +180,13 @@ def gotoMov(request, id_mov_encabezado):
                 and mov_encabezado.tipo_mov in tipos_para_autorizar) or (logged_user.isAdmin):
             return redirect("/movs/autorizacion/" + str(mov_encabezado.id))
         areas_para_ver = logged_user.areas_para_solicitar.all() \
-                  .union(logged_user.areas_para_ejecutar.all())
+            .union(logged_user.areas_para_ejecutar.all())
         tipos_para_ver = logged_user.tipos_para_solicitar.all() \
-                  .union(logged_user.tipos_para_ejecutar.all())
+            .union(logged_user.tipos_para_ejecutar.all())
         if (mov_encabezado.area in areas_para_ver
                 and mov_encabezado.tipo_mov in tipos_para_ver) or (logged_user.isAdmin):
             return redirect("/movs/solicitud/" + str(mov_encabezado.id))
         return redirect("/")
-
 
     if mov_encabezado.estado == "AUTORIZADO":
         areas_para_ejecutar = logged_user.areas_para_ejecutar.all()
@@ -191,14 +195,14 @@ def gotoMov(request, id_mov_encabezado):
                 and mov_encabezado.tipo_mov in tipos_para_ejecutar) or (logged_user.isAdmin):
             return redirect("/movs/ejecucion/" + str(mov_encabezado.id))
         areas_para_ver = logged_user.areas_para_solicitar.all() \
-                  .union(logged_user.areas_para_autorizar.all())
+            .union(logged_user.areas_para_autorizar.all())
         tipos_para_ver = logged_user.tipos_para_solicitar.all() \
-                  .union(logged_user.tipos_para_autorizar.all())
+            .union(logged_user.tipos_para_autorizar.all())
         if (mov_encabezado.area in areas_para_ver
                 and mov_encabezado.tipo_mov in tipos_para_ver) or (logged_user.isAdmin):
             return redirect("/movs/ejecucion/" + str(mov_encabezado.id))
         return redirect("/")
-    
+
 
 def solicitud(request, id_mov_encabezado):
     if "id" not in request.session:
@@ -217,7 +221,7 @@ def solicitud(request, id_mov_encabezado):
         return redirect("/")
 
     producto_form = AddProductoToMovForm()
-    context = {} 
+    context = {}
 
     if request.method == "POST":
 
@@ -266,14 +270,14 @@ def solicitud(request, id_mov_encabezado):
     context["user_ejecutando"] = False
     if mov_encabezado.estado == "CREADO":
         mov_estado_creado = mov_encabezado.mov_estados \
-                            .get(estado__name="CREADO")
+            .get(estado__name="CREADO")
         if mov_estado_creado.user == logged_user:
             context["user_solicitando"] = True
 
     context["user"] = logged_user
 
     return render(request, "editMov.html", context)
-  
+
 
 def autorizacion(request, id_mov_encabezado):
     if "id" not in request.session:
@@ -291,7 +295,7 @@ def autorizacion(request, id_mov_encabezado):
     if mov_encabezado.estado not in ["SOLICITADO", "NO AUTORIZADO"]:
         return redirect("/")
 
-    context = {} 
+    context = {}
 
     context["mov_encabezado"] = mov_encabezado
 
@@ -326,7 +330,7 @@ def ejecucion(request, id_mov_encabezado):
     if mov_encabezado.estado != "AUTORIZADO":
         return redirect("/")
 
-    context = {} 
+    context = {}
 
     context["mov_encabezado"] = mov_encabezado
 
@@ -450,6 +454,7 @@ def sacarPDF(request, id_mov_encabezado):
     pdf = render_to_pdf('pdf.html', data)
     return HttpResponse(pdf, content_type='application/pdf')
 
+
 def sacarPDFstock(request):
     stocks = Stock.objects.filter(cantidad__gt=0)
     cantidad_productos = stocks.count()
@@ -478,3 +483,39 @@ def sacarPDFSinstock(request):
     }
     pdf = render_to_pdf('pdfSinStock.html', data)
     return HttpResponse(pdf, content_type='application/pdf')
+
+
+def modificarStock(mov):
+    ponderador = mov.tipo_mov.folio.signo_stock
+    print(ponderador)
+    items = mov.mov_items.all()
+    for item in items:
+        producto_a_modificar = Producto.objects.get(id=item.producto.id)
+        stock_a_modificar = Stock.objects.get(id=producto_a_modificar.id)
+        # Sacamos precio
+        if stock_a_modificar.cantidad != 0:
+            precio_actual = stock_a_modificar.monto_total/stock_a_modificar.cantidad
+
+        else:
+
+            precio_actual = 0
+        # Modificamos cantidad. Si es entrada, el ponderador será +1. Si es salida restar+a
+
+        stock_a_modificar.cantidad += item.cant_ejecutada*ponderador
+        stock_a_modificar.save()
+
+        # Modificamos monto total
+        if ponderador == 1:
+            stock_a_modificar.monto_total += item.precio_unit*item.cant_ejecutada
+        else:
+            stock_a_modificar.monto_total -= precio_actual*item.cant_ejecutada
+        stock_a_modificar.save()
+
+
+def modificando_stock(request, id_mov_encabezado):
+    if "id" not in request.session:
+        return redirect("/")
+    mov = MovEncabezado.objects.get(id=id_mov_encabezado)
+    print(mov)
+    modificarStock(mov)
+    return redirect("/productos/view")
