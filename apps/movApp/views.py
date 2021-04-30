@@ -50,14 +50,22 @@ def gotoDashboard(request, id_user, tipo):
 
         #all_areas = getUserCreandoAreasPermitidas(user)
 
+        context = {}
+
         if user.isAdmin:
             all_areas = Area.objects.filter(is_active=True).order_by('pos')
             all_movimientos = TipoMov.objects.filter(is_active=True).order_by('pos')
+            context.update({
+                'all_areas': all_areas,
+                'all_movimientos': all_movimientos,
+            })
         elif user.puedeSolicitar:
             all_areas = user.areas_para_solicitar.filter(is_active=True).distinct('pos').order_by('pos')
             all_movimientos = user.tipos_para_solicitar.filter(is_active=True).distinct('pos').order_by('pos')
-
-        context = {}
+            context.update({
+                'all_areas': all_areas,
+                'all_movimientos': all_movimientos,
+            })
 
         if len(User.objects.filter(id=id_user)) > 0:
             user_dash = User.objects.get(id=id_user)
@@ -75,15 +83,14 @@ def gotoDashboard(request, id_user, tipo):
                      (estado_mov.mov_encabezado not in encabezados):
                     encabezados.append(estado_mov.mov_encabezado)
 
-        context = {
+        context.update({
             'tipo': tipo,
             'user': user,
             'user_dash' : user_dash,
             'encabezados': encabezados,
-            'all_areas': all_areas,
-            'all_movimientos': all_movimientos,
             'mis_o_todos':mis_o_todos,
-        }
+        })
+
 
         return render(request, 'dashboard.html', context)
     return redirect("/")
@@ -98,6 +105,7 @@ def requestNewMov(request):
                 logged_user = user[0]
                 if ("area" not in request.POST
                         or "tipo_mov" not in request.POST):
+                    messages.error(request,"Debe indicar el área y tipo de movimiento a crear.")
                     return redirect("/movs/0/activemov")
                 area_id = request.POST["area"]
                 tipo_mov_id = request.POST["tipo_mov"]

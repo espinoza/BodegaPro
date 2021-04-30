@@ -157,7 +157,7 @@
             {% endif %}
         </tr>
     </thead>
-    {% for mov_item in mov_encabezado.mov_items.all %}
+    {% for mov_item in mov_encabezado.mov_items_sorted_updated.all %}
     <tbody>
         <tr id="tr-item-{{ mov_item.id }}">
         <!--tr id="tr-{{ mov_item.producto.id }}"-->
@@ -179,6 +179,7 @@
             <td scope="col">
                 <form class="form-inline"  method='POST' action="" id="form-edit-item-{{ mov_item.id }}" {#% url 'edit_item' mov_encabezado.id %#}">
                     {% csrf_token %}
+                    
                     <input type="hidden" name="id_item" value="{{mov_item.id}}">
                     <input class="col-2" type="number" name="quantity" min="0" style="width:50px;"
                            value="{% if user_solicitando %}{{mov_item.cant_solicitada}}{% elif user_autorizando %}{{mov_item.cant_autorizada}}{% elif user_ejecutando %}{{mov_item.cant_ejecutada}}{% endif %}">
@@ -201,7 +202,7 @@
     {% empty %}
         <tr>
             <td></td>
-            <td><p>No hay productos en la lista</p></td>
+            <td colspan="7"><p>No hay productos en la lista</p></td>
         </tr>
     {% endfor %}
 </table>

@@ -36,6 +36,10 @@ class MovEncabezado(models.Model):
         return f"Tipo:{self.tipo_mov.name} folio:{self.folio}"
 
     @property
+    def mov_items_sorted_updated(self):
+        return self.mov_items.order_by('-updated_at')
+
+    @property
     def estado(self):
         estados = self.mov_estados.all()
         if len(estados.filter(estado__name='EJECUTADO')) > 0:
