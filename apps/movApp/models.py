@@ -120,6 +120,10 @@ class MovEncabezado(models.Model):
                 pass
         return monto
 
+    @property
+    def abierto(self):
+        return self.estado not in ["CANCELADO", "NO AUTORIZADO", "EJECUTADO"]
+
 
 class MovItem(models.Model):
     mov_encabezado = models.ForeignKey(
@@ -129,6 +133,7 @@ class MovItem(models.Model):
     cant_solicitada = models.FloatField()
     cant_autorizada = models.FloatField(null=True)
     cant_ejecutada = models.FloatField(null=True)
+    stock_antes_de_cerrar = models.FloatField(null=True)
     precio_unit = models.FloatField(null=True)
     created_at = DateTimeField(auto_now_add=True)
     updated_at = DateTimeField(auto_now=True)

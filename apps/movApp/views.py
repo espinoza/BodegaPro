@@ -367,6 +367,18 @@ def cambiarEstado(request, id_mov_encabezado):
                 mov_item.cant_ejecutada = mov_item.cant_autorizada
                 mov_item.save()
 
+        if new_estado.name == "EJECUTADO":
+            modificarStock(mov)
+            return redirect("/productos/view")
+
+        if new_estado.name in ["CANCELADO", "NO AUTORIZADO", "EJECUTADO"]:
+            for mov_item in mov.mov_items.all():
+                mov_item.stock_antes_de_cerrar = \
+                    mov_item.producto.stock_data.cantidad
+                mov_item.precio_unit = mov_item.producto.precio_unit
+                mov_item.save()
+            return redirect(f"/movs/view/{id_mov_encabezado}")
+
         return redirect('/movs/0/activemov')
     except:
         return redirect("/")
@@ -439,12 +451,3 @@ def modificarStock(mov):
         else:
             stock_a_modificar.monto_total -= precio_actual*item.cant_ejecutada
         stock_a_modificar.save()
-
-
-def modificando_stock(request, id_mov_encabezado):
-    if "id" not in request.session:
-        return redirect("/")
-    mov = MovEncabezado.objects.get(id=id_mov_encabezado)
-    print(mov)
-    modificarStock(mov)
-    return redirect("/productos/view")

@@ -148,7 +148,13 @@
             {%if mov_encabezado.estado == "AUTORIZADO" or mov_encabezado.estado == "EJECUTADO" %}
                 <th scope="col" style="width:8%">Cant. Concretada</th>
             {%endif%}
-            <th scope="col" style="width:8%">$ Unit</th>
+            {% if mov_encabezado.abierto %}
+                <th scope="col" style="width:8%">$ Unit</th>
+                <th scope="col">Stock</th>
+            {% else %}
+                <th scope="col" style="width:8%">$ Unit histórico</th>
+                <th scope="col">Stock histórico</th>
+            {% endif %}
             {% if user_solicitando or user_autorizando or user_ejecutando %}
             <th scope="col">Editar</th>
             {% endif %}
@@ -157,8 +163,8 @@
             {% endif %}
         </tr>
     </thead>
-    {% for mov_item in mov_encabezado.mov_items.all %}
     <tbody>
+    {% for mov_item in mov_encabezado.mov_items.all %}
         <tr id="tr-{{ mov_item.producto.id }}">
             <td scope="col"><img class="avatar" src="/media/{{ mov_item.producto.img_url }}" alt="Prod Img"></td>
             <td scope="col">{{ mov_item.producto.cod }}</td>
@@ -171,9 +177,15 @@
             {%if mov_encabezado.estado == "AUTORIZADO" or mov_encabezado.estado == "EJECUTADO" %}
                 <td scope="col">{% if mov_item.cant_ejecutada == None %} 0 {%else%} {{ mov_item.cant_ejecutada }} {%endif%}</td>
             {%endif%}
-            <td scope="col">{{ mov_item.producto.precio_unit }}</td>
-            <!--td scope="col">{% if mov_item.precio_unit == None %} 0 {%else%} {{ mov_item.precio_unit }} {%endif%}</td-->
 
+            {% if mov_encabezado.abierto %}
+                <td scope="col">{{ mov_item.producto.precio_unit }}</td>
+                <!--td scope="col">{% if mov_item.precio_unit == None %} 0 {%else%} {{ mov_item.precio_unit }} {%endif%}</td-->
+                <td>{{mov_item.producto.stock_data.cantidad}}</td>
+            {% else %}
+                <td scope="col">{{ mov_item.precio_unit }}</td>
+                <td scope="col">{{mov_item.stock_antes_de_cerrar}}</td>
+            {% endif %}
             {% if user_solicitando or user_autorizando or user_ejecutando %}
             <td scope="col">
                 <form class="form-inline"  method='POST' action="{% url 'edit_item' mov_encabezado.id %}">
@@ -196,13 +208,13 @@
             </td>
             {% endif %}
         </tr>
-    </tbody>
     {% empty %}
         <tr>
             <td></td>
             <td><p>No hay productos en la lista</p></td>
         </tr>
     {% endfor %}
+    </tbody>
 </table>
 
 {% endif %}
