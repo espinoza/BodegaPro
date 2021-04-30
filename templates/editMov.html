@@ -42,7 +42,7 @@
         {% csrf_token %}  
         <input type="hidden" name="new_status" value="NO AUTORIZADO">
         <input type="hidden" name="id_mov" value="{{mov_encabezado.id}}">
-        <button class=" btn btn-danger h-red mg-auto" id="btn-add-item"><i class="far fa-angle-double-up"></i> NO AUTORIZAR </button>
+        <button class=" btn btn-danger h-red mg-auto" id="btn-add-item"><i class="far fa-times-circle"></i> NO AUTORIZAR </button>
     </form>
 {% elif mov_encabezado.estado == 'AUTORIZADO' and user_ejecutando %}
     <form  method = 'POST' action="{% url 'change_status' mov_encabezado.id %}">
