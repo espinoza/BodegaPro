@@ -7,7 +7,7 @@
             .customers {
             font-family: Arial, Helvetica, sans-serif;
             border-collapse: collapse;
-            width: 100%;
+            
             margin-top: 10px;
             }
 
@@ -26,6 +26,13 @@
             text-align: left;
             background-color: #4CAF50;
             color: white;
+            }
+            
+            .table th,tr {
+              text-align: center;
+            }
+            .encabezado {
+              height: 50px;
             }
         </style>
 {% endblock %}
@@ -46,7 +53,7 @@
 <table class="customers">
       <thead>
         <tr>
-          <th scope="col">Pasos</th>
+          <th class="encabezado" scope="col">Pasos</th>
         </tr>
     </thead>
      {% for estados in movimientos%}
@@ -61,13 +68,13 @@
       <thead>
         <tr>
           
-          <th scope="col">Cod</th>
-          <th scope="col" style="width:40%">Descripcion</th>
-          <th scope="col" >Cant. Solicitada</th>
-          <th scope="col" >Un</th>
-          <th scope="col" >Cant. Autorizada</th>
-          <th scope="col" >Cant. Concretada</th>
-          <th scope="col" >$ Unit</th>
+          <th class="encabezado" scope="col">Cod</th>
+          <th class="encabezado" scope="col" style="width:35%">Descripcion</th>
+          <th class="encabezado" scope="col" style="width:12%">Cant. Solicitada</th>
+          <th class="encabezado" scope="col">Un</th>
+          <th class="encabezado" scope="col" style="width:12%">Cant. Autorizada</th>
+          <th class="encabezado" scope="col" style="width:12%">Cant. Concretada</th>
+          <th class="encabezado" scope="col">$ Unit</th>
          
         </tr>
     </thead>
