@@ -8,6 +8,7 @@
 {% block title %}BodegaPro{% endblock %}
 
 {% block content %}
+
 {% with id_user=user_dash.id  %}
 <div class="container b" >
     <div class="row">
@@ -20,16 +21,17 @@
             Todos los Movimientos
             {% endif %}
             {% if tipo == "activemov" %}
-            <span class="badge rounded-pill bg-primary">Activas</span>
+            <span class="badge rounded-pill bg-primary">Activos</span>
             {% endif %}
             {% if tipo == "activemov" %}
-            <a class="col blurred-link" href="{% url 'dashboard' id_user=id_user tipo='allmov' %}">Ver todas</a>
+            <a class="col blurred-link" href="{% url 'dashboard' id_user=id_user tipo='allmov' %}">Todos</a>
             {% else %}
-            <span class="badge rounded-pill bg-primary">Todas</span>
-            <a class="col blurred-link" href="{% url 'dashboard' id_user=id_user tipo='activemov' %}">Solo Activas</a>
+            <span class="badge rounded-pill bg-primary">Todos</span>
+            <a class="col blurred-link" href="{% url 'dashboard' id_user=id_user tipo='activemov' %}">Solo Activos</a>
             {% endif %}
         </h3>
         {% if id_user == request.session.id %}
+        {% if user.puedeSolicitar or user.isAdmin %}
         <div class="col">
             <div class="container-fluid">
                 <form class="row" action="{% url 'request_new_mov' %}" method="post">
@@ -54,6 +56,7 @@
                 </form>                   
             </div>
         </div>
+        {% endif %}
         {% endif %}
     </div>
 </div>
@@ -117,19 +120,19 @@
                                             {%if encabezado.estado == "SOLICITADO" or encabezado.estado == "AUTORIZADO" or encabezado.estado == "NO AUTORIZADO" or encabezado.estado == "EJECUTADO"%}                                         
                                                 {%for mov_estado in encabezado.mov_estados.all%}                                            
                                                     {%if mov_estado.estado.name == "SOLICITADO" %}                                           
-                                                    <p class=" container btn btn-sm btn-success text-white">{{mov_estado.user.name1}} <br> Solicitó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    <p class=" container btn btn-sm btn-success text-white">{{mov_estado.user.name1}} <br> Solicitó <br>{{mov_estado.created_at|date:"M d, y H:i"}}</p>
                                                     {%endif%}
                                                 {%endfor%}
                                             {%elif encabezado.estado == "CREADO" %}                                         
                                                 {%for mov_estado in encabezado.mov_estados.all%}                                            
                                                     {%if mov_estado.estado.name == "CREADO" %}                                           
-                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Creó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Creó <br>{{mov_estado.created_at|date:"M d, y H:i"}}</p>
                                                     {%endif%}
                                                 {%endfor%}
                                             {%elif encabezado.estado == "CANCELADO" %}                                         
                                                 {%for mov_estado in encabezado.mov_estados.all%}                                            
                                                     {%if mov_estado.estado.name == "CANCELADO" %}                                           
-                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Canceló <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Canceló <br>{{mov_estado.created_at|date:"M d, y H:i"}}</p>
                                                     {%endif%}
                                                 {%endfor%}
                                             {%endif%}
@@ -138,13 +141,13 @@
                                             {%if encabezado.estado == "AUTORIZADO" or encabezado.estado == "EJECUTADO"%}    
                                                 {%for mov_estado in encabezado.mov_estados.all%} 
                                                     {%if mov_estado.estado.name == "AUTORIZADO"%} 
-                                                    <p class="container  btn btn-sm btn-primary text-white">{{mov_estado.user.name1}} <br> Autorizó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    <p class="container  btn btn-sm btn-primary text-white">{{mov_estado.user.name1}} <br> Autorizó <br>{{mov_estado.created_at|date:"M d, y H:i"}}</p>
                                                     {%endif%}  
                                                 {%endfor%}
                                             {%elif encabezado.estado == "NO AUTORIZADO" %}                                         
                                                 {%for mov_estado in encabezado.mov_estados.all%}                                            
                                                     {%if mov_estado.estado.name == "NO AUTORIZADO" %}                                           
-                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> No Autorizó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> No Autorizó <br>{{mov_estado.created_at|date:"M d, y H:i"}}</p>
                                                     {%endif%}
                                                 {%endfor%}
                                             {%endif%}
@@ -153,7 +156,7 @@
                                             {%if encabezado.estado == "EJECUTADO" %} 
                                                 {%for mov_estado in encabezado.mov_estados.all%} 
                                                     {%if mov_estado.estado.name == "EJECUTADO"%} 
-                                                    <p class="container btn btn-sm btn-warning text-white">{{mov_estado.user.name1}} <br> Ejecutó <br>{{mov_estado.created_at|date:"M d, Y"}}</p> 
+                                                    <p class="container btn btn-sm btn-warning text-white">{{mov_estado.user.name1}} <br> Ejecutó <br>{{mov_estado.created_at|date:"M d, y H:i"}}</p> 
                                                     {%endif%}
                                                 {%endfor%}
                                             {%endif%}                                       
@@ -202,19 +205,19 @@
                                             {%if encabezado.estado == "SOLICITADO" or encabezado.estado == "AUTORIZADO" or encabezado.estado == "NO AUTORIZADO" or encabezado.estado == "EJECUTADO"%}                                         
                                                 {%for mov_estado in encabezado.mov_estados.all%}                                            
                                                     {%if mov_estado.estado.name == "SOLICITADO" %}                                           
-                                                    <p class=" container btn btn-sm btn-success text-white">{{mov_estado.user.name1}} <br> Solicitó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    <p class=" container btn btn-sm btn-success text-white">{{mov_estado.user.name1}} <br> Solicitó <br>{{mov_estado.created_at|date:"M d, y H:i"}}</p>
                                                     {%endif%}
                                                 {%endfor%}
                                             {%elif encabezado.estado == "CREADO" %}                                         
                                                 {%for mov_estado in encabezado.mov_estados.all%}                                            
                                                     {%if mov_estado.estado.name == "CREADO" %}                                           
-                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Creó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Creó <br>{{mov_estado.created_at|date:"M d, y H:i"}}</p>
                                                     {%endif%}
                                                 {%endfor%}
                                             {%elif encabezado.estado == "CANCELADO" %}                                         
                                                 {%for mov_estado in encabezado.mov_estados.all%}                                            
                                                     {%if mov_estado.estado.name == "CANCELADO" %}                                           
-                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Canceló <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Canceló <br>{{mov_estado.created_at|date:"M d, y H:i"}}</p>
                                                     {%endif%}
                                                 {%endfor%}
                                             {%endif%}
@@ -223,13 +226,13 @@
                                             {%if encabezado.estado == "AUTORIZADO" or encabezado.estado == "EJECUTADO"%}    
                                                 {%for mov_estado in encabezado.mov_estados.all%} 
                                                     {%if mov_estado.estado.name == "AUTORIZADO"%} 
-                                                    <p class="container  btn btn-sm btn-primary text-white">{{mov_estado.user.name1}} <br> Autorizó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    <p class="container  btn btn-sm btn-primary text-white">{{mov_estado.user.name1}} <br> Autorizó <br>{{mov_estado.created_at|date:"M d, y H:i"}}</p>
                                                     {%endif%}  
                                                 {%endfor%}
                                             {%elif encabezado.estado == "NO AUTORIZADO" %}                                         
                                                 {%for mov_estado in encabezado.mov_estados.all%}                                            
                                                     {%if mov_estado.estado.name == "NO AUTORIZADO" %}                                           
-                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> No Autorizó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> No Autorizó <br>{{mov_estado.created_at|date:"M d, y H:i"}}</p>
                                                     {%endif%}
                                                 {%endfor%}
                                             {%endif%}
@@ -238,7 +241,7 @@
                                             {%if encabezado.estado == "EJECUTADO" %} 
                                                 {%for mov_estado in encabezado.mov_estados.all%} 
                                                     {%if mov_estado.estado.name == "EJECUTADO"%} 
-                                                    <p class="container btn btn-sm btn-warning text-white">{{mov_estado.user.name1}} <br> Ejecutó <br>{{mov_estado.created_at|date:"M d, Y"}}</p> 
+                                                    <p class="container btn btn-sm btn-warning text-white">{{mov_estado.user.name1}} <br> Ejecutó <br>{{mov_estado.created_at|date:"M d, y H:i"}}</p> 
                                                     {%endif%}
                                                 {%endfor%}
                                             {%endif%}                                       
@@ -291,19 +294,19 @@
                                             {%if encabezado.estado == "SOLICITADO" or encabezado.estado == "AUTORIZADO" or encabezado.estado == "NO AUTORIZADO" or encabezado.estado == "EJECUTADO"%}                                         
                                                 {%for mov_estado in encabezado.mov_estados.all%}                                            
                                                     {%if mov_estado.estado.name == "SOLICITADO" %}                                           
-                                                    <p class=" container btn btn-sm btn-success text-white">{{mov_estado.user.name1}} <br> Solicitó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    <p class=" container btn btn-sm btn-success text-white">{{mov_estado.user.name1}} <br> Solicitó <br>{{mov_estado.created_at|date:"M d, y H:i"}}</p>
                                                     {%endif%}
                                                 {%endfor%}
                                             {%elif encabezado.estado == "CREADO" %}                                         
                                                 {%for mov_estado in encabezado.mov_estados.all%}                                            
                                                     {%if mov_estado.estado.name == "CREADO" %}                                           
-                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Creó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Creó <br>{{mov_estado.created_at|date:"M d, y H:i"}}</p>
                                                     {%endif%}
                                                 {%endfor%}
                                             {%elif encabezado.estado == "CANCELADO" %}                                         
                                                 {%for mov_estado in encabezado.mov_estados.all%}                                            
                                                     {%if mov_estado.estado.name == "CANCELADO" %}                                           
-                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Canceló <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Canceló <br>{{mov_estado.created_at|date:"M d, y H:i"}}</p>
                                                     {%endif%}
                                                 {%endfor%}
                                             {%endif%}
@@ -312,13 +315,13 @@
                                             {%if encabezado.estado == "AUTORIZADO" or encabezado.estado == "EJECUTADO"%}    
                                                 {%for mov_estado in encabezado.mov_estados.all%} 
                                                     {%if mov_estado.estado.name == "AUTORIZADO"%} 
-                                                    <p class="container  btn btn-sm btn-primary text-white">{{mov_estado.user.name1}} <br> Autorizó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    <p class="container  btn btn-sm btn-primary text-white">{{mov_estado.user.name1}} <br> Autorizó <br>{{mov_estado.created_at|date:"M d, y H:i"}}</p>
                                                     {%endif%}  
                                                 {%endfor%}
                                             {%elif encabezado.estado == "NO AUTORIZADO" %}                                         
                                                 {%for mov_estado in encabezado.mov_estados.all%}                                            
                                                     {%if mov_estado.estado.name == "NO AUTORIZADO" %}                                           
-                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> No Autorizó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> No Autorizó <br>{{mov_estado.created_at|date:"M d, y H:i"}}</p>
                                                     {%endif%}
                                                 {%endfor%}
                                             {%endif%}
@@ -327,7 +330,7 @@
                                             {%if encabezado.estado == "EJECUTADO" %} 
                                                 {%for mov_estado in encabezado.mov_estados.all%} 
                                                     {%if mov_estado.estado.name == "EJECUTADO"%} 
-                                                    <p class="container btn btn-sm btn-warning text-white">{{mov_estado.user.name1}} <br> Ejecutó <br>{{mov_estado.created_at|date:"M d, Y"}}</p> 
+                                                    <p class="container btn btn-sm btn-warning text-white">{{mov_estado.user.name1}} <br> Ejecutó <br>{{mov_estado.created_at|date:"M d, y H:i"}}</p> 
                                                     {%endif%}
                                                 {%endfor%}
                                             {%endif%}                                       
@@ -376,19 +379,19 @@
                                             {%if encabezado.estado == "SOLICITADO" or encabezado.estado == "AUTORIZADO" or encabezado.estado == "NO AUTORIZADO" or encabezado.estado == "EJECUTADO"%}                                         
                                                 {%for mov_estado in encabezado.mov_estados.all%}                                            
                                                     {%if mov_estado.estado.name == "SOLICITADO" %}                                           
-                                                    <p class=" container btn btn-sm btn-success text-white">{{mov_estado.user.name1}} <br> Solicitó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    <p class=" container btn btn-sm btn-success text-white">{{mov_estado.user.name1}} <br> Solicitó <br>{{mov_estado.created_at|date:"M d, y H:i"}}</p>
                                                     {%endif%}
                                                 {%endfor%}
                                             {%elif encabezado.estado == "CREADO" %}                                         
                                                 {%for mov_estado in encabezado.mov_estados.all%}                                            
                                                     {%if mov_estado.estado.name == "CREADO" %}                                           
-                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Creó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Creó <br>{{mov_estado.created_at|date:"M d, y H:i"}}</p>
                                                     {%endif%}
                                                 {%endfor%}
                                             {%elif encabezado.estado == "CANCELADO" %}                                         
                                                 {%for mov_estado in encabezado.mov_estados.all%}                                            
                                                     {%if mov_estado.estado.name == "CANCELADO" %}                                           
-                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Canceló <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> Canceló <br>{{mov_estado.created_at|date:"M d, y H:i"}}</p>
                                                     {%endif%}
                                                 {%endfor%}
                                             {%endif%}
@@ -397,13 +400,13 @@
                                             {%if encabezado.estado == "AUTORIZADO" or encabezado.estado == "EJECUTADO"%}    
                                                 {%for mov_estado in encabezado.mov_estados.all%} 
                                                     {%if mov_estado.estado.name == "AUTORIZADO"%} 
-                                                    <p class="container  btn btn-sm btn-primary text-white">{{mov_estado.user.name1}} <br> Autorizó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    <p class="container  btn btn-sm btn-primary text-white">{{mov_estado.user.name1}} <br> Autorizó <br>{{mov_estado.created_at|date:"M d, y H:i"}}</p>
                                                     {%endif%}  
                                                 {%endfor%}
                                             {%elif encabezado.estado == "NO AUTORIZADO" %}                                         
                                                 {%for mov_estado in encabezado.mov_estados.all%}                                            
                                                     {%if mov_estado.estado.name == "NO AUTORIZADO" %}                                           
-                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> No Autorizó <br>{{mov_estado.created_at|date:"M d, Y"}}</p>
+                                                    <p class="container  btn btn-sm btn-light text-dark border">{{mov_estado.user.name1}} <br> No Autorizó <br>{{mov_estado.created_at|date:"M d, y H:i"}}</p>
                                                     {%endif%}
                                                 {%endfor%}
                                             {%endif%}
@@ -412,7 +415,7 @@
                                             {%if encabezado.estado == "EJECUTADO" %} 
                                                 {%for mov_estado in encabezado.mov_estados.all%} 
                                                     {%if mov_estado.estado.name == "EJECUTADO"%} 
-                                                    <p class="container btn btn-sm btn-warning text-white">{{mov_estado.user.name1}} <br> Ejecutó <br>{{mov_estado.created_at|date:"M d, Y"}}</p> 
+                                                    <p class="container btn btn-sm btn-warning text-white">{{mov_estado.user.name1}} <br> Ejecutó <br>{{mov_estado.created_at|date:"M d, y H:i"}}</p> 
                                                     {%endif%}
                                                 {%endfor%}
                                             {%endif%}                                       

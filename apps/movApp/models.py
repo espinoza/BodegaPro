@@ -51,24 +51,34 @@ class MovEncabezado(models.Model):
     def num_items_solicitado(self):
         n = 0
         for fila_det in self.mov_items.all():
-            if abs(fila_det.cant_solicitada) > 0:
-                n+=1
+            try:
+                if abs(fila_det.cant_solicitada) > 0:
+                    n+=1
+            except:
+                pass
+
         return n
 
     @property 
     def num_items_autorizado(self):
         n = 0
         for fila_det in self.mov_items.all():
-            if abs(fila_det.cant_autorizada) > 0:
-                n+=1
+            try:
+                if abs(fila_det.cant_autorizada) > 0:
+                    n+=1
+            except:
+                pass
         return n
 
     @property 
     def num_items_ejecutado(self):
         n = 0
         for fila_det in self.mov_items.all():
-            if abs(fila_det.cant_ejecutada) > 0:
-                n+=1
+            try:
+                if abs(fila_det.cant_ejecutada) > 0:
+                    n+=1
+            except:
+                pass
         return n
 
 
@@ -76,21 +86,30 @@ class MovEncabezado(models.Model):
     def monto_solicitado(self):
         monto = 0
         for fila_det in self.mov_items.all():
-            monto += fila_det.monto_solicitado
+            try:
+                monto += fila_det.monto_solicitado
+            except:
+                pass
         return monto
 
     @property
     def monto_autorizado(self):
         monto = 0
         for fila_det in self.mov_items.all():
-            monto += fila_det.monto_autorizado
+            try:
+                monto += fila_det.monto_autorizado
+            except:
+                pass
         return monto
 
     @property
     def monto_ejecutado(self):
         monto = 0
         for fila_det in self.mov_items.all():
-            monto += fila_det.monto_ejecutado
+            try:
+                monto += fila_det.monto_ejecutado
+            except:
+                pass
         return monto
 
 class MovItem(models.Model):

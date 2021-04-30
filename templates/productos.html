@@ -18,9 +18,9 @@
 {% block content %}
 
 <div class="row">
-<h3 class="col-9">Maestro de Productos</h3>
-<a href="{% url 'generar_pdf_stock' %}" class="col-1 btn btn-outline-secondary" style="margin-right: 20px;">PDF</a>
-<a href="{% url 'generar_pdf_sin_stock' %}" class="col-1 btn btn-outline-secondary">PDF S/Stock</a>
+<h3 class="col-md-9 col-12">Maestro de Productos</h3>
+<a href="{% url 'generar_pdf_stock' %}" class="col-5 col-md-1 btn btn-outline-secondary h-red" style="margin-right: 20px;">PDF Con Stock</a>
+<a href="{% url 'generar_pdf_sin_stock' %}" class="col-5 col-md-1 btn btn-outline-secondary h-red">PDF Sin Stock</a>
 </div>
 
 {% if messages %}
@@ -37,7 +37,7 @@
     <div class="row">
         {% if tipo == 'edit' %}
         <div class="col-md-2 form-floating mb-3">
-            <select class="form-select" name="isactive" id="filter-isactive">
+            <select class="form-select" name="isactive" id="filter-sel-isactive">
                 <option value="1" selected>Activos</option>
                 <option value="0">Todos</option>
                 <option value="-1">Inactivos</option>
@@ -46,7 +46,7 @@
         </div>
         {% endif %}
         <div class="col-md-2 form-floating mb-3">
-            <select class="form-select" name="familias" id="filter-familia">
+            <select class="form-select" name="familias" id="filter-sel-familia">
                 {% if not new_product.familia_id %}
                 <option value="0" selected>TODAS</option>
                 {% endif %}
@@ -61,8 +61,8 @@
             <label class="mgl08rem" for="filter-contains">Producto contiene...</label>
         </div>
 
-        <button class="col-md-1 btn btn-success h-red" id="btn-filter">Filtrar</button> 
-        <button class="col-md-1 btn btn-secondary h-red" id="btn-filter-reset">Borrar</button> 
+        <!--button class="col-md-1 btn btn-success h-red" id="btn-filter" style="margin-right: 20px;">Filtrar</button--> 
+        <button class="col-md-1 btn btn-outline-secondary h-red" id="btn-filter-reset" style="height:40px; width:40px; border: 0px"></button> 
 
     </div>
 </form>
@@ -91,7 +91,7 @@
                 {% if new_product.unidad_medida and new_product.unidad_medida == unidad.id %}selected{% endif %}>{{ unidad.name }}</option>
                 {% endfor %}
             </select>
-            <!--label for="unidad_medida">Unidad</label-->
+            <label for="familia" class="mgl08rem">Unidad</label>
         </div>
         <div class="col-md-2 form-floating mb-3">
             <select class="form-select" name="familia" id="familia">
@@ -103,7 +103,7 @@
                 {% if new_product.familia and new_product.familia == familia.id %}selected{% endif %}>{{ familia.name }}</option>
                 {% endfor %}
             </select>
-            <!--label for="familia">Familia</label-->
+            <label for="familia" class="mgl08rem">Familia</label>
         </div>
         <div class="col-md-2 form-floating mb-3">
             <input class="form-control-file" type="file" name="img_url" style="margin-top: 20px;">
@@ -137,7 +137,7 @@
 
 
 <script>
-    getProductos()
+    getProductos(false)
 </script>
 
 {% endblock %}
