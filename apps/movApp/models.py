@@ -31,6 +31,9 @@ class MovEncabezado(models.Model):
 
     objects = MovManager()
 
+    def __str__(self):
+        return f"Tipo:{self.tipo_mov.name} folio:{self.folio}"
+
     @property
     def estado(self):
         estados = self.mov_estados.all()
@@ -126,6 +129,9 @@ class MovItem(models.Model):
     precio_unit = models.FloatField(null=True)
     created_at = DateTimeField(auto_now_add=True)
     updated_at = DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Producto:{self.producto.name} folio:{self.mov_encabezado.folio} tipo:{self.mov_encabezado.tipo_mov.name}"
 
     @property
     def monto_solicitado(self):

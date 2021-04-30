@@ -10,6 +10,7 @@ from .forms import NewMovEncabezadoForm, EditMovEncabezadoForm, \
 from django.contrib import messages
 from .utils import render_to_pdf
 from datetime import datetime
+from BodegaPro.settings import MEDIA_URL
 
 #MISC
 def getUserCreandoAreasPermitidas(user: User):
@@ -239,6 +240,7 @@ def solicitud(request, id_mov_encabezado):
                 mov_encabezado.save()
 
         if "cant_solicitada" in request.POST:
+
             producto_form = AddProductoToMovForm(request.POST)
             if producto_form.is_valid():
                 cod = request.POST["cod"]
@@ -254,7 +256,10 @@ def solicitud(request, id_mov_encabezado):
                     producto_form.add_error("cod", "Producto no encontrado")
                 if len(producto) > 1:
                     context["posibles_productos"] = producto
-                if len(producto) == 1:
+
+                if len(mov_encabezado.mov_items.filter(producto=producto[0].id))>0:
+                    producto_form.add_error("cod", "Producto ya ingresado. Edite la cantidad.")
+                elif len(producto) == 1:
                     MovItem.objects.create(
                         mov_encabezado=mov_encabezado,
                         producto=producto[0],
@@ -263,7 +268,7 @@ def solicitud(request, id_mov_encabezado):
 
     initial_data = {
         "descripcion": mov_encabezado.descripcion,
-        "area": mov_encabezado.area
+        "area": mov_encabezado.area,
     }
     encabezado_form = EditMovEncabezadoForm(initial=initial_data)
 
@@ -279,6 +284,7 @@ def solicitud(request, id_mov_encabezado):
                             .get(estado__name="CREADO")
         if mov_estado_creado.user == logged_user:
             context["user_solicitando"] = True
+            context['media_url'] = MEDIA_URL
 
     context["user"] = logged_user
 

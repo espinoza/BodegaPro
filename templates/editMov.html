@@ -7,7 +7,11 @@
 {% endblock %}
 
 {% block extraScripts %}
-<script src="{% static 'js/functionsProductos.js' %}"></script>
+<script src="{% static 'js/functionsMov.js' %}"></script>
+{% endblock %}
+
+{% block modales %}
+{% include "modalmovprod.html" %}
 {% endblock %}
 
 {% block content %}
@@ -45,8 +49,8 @@
 
 {% if mov_encabezado %}
     <div class="row">
-    <h2 class="col-8">Folio n°: {{mov_encabezado.folio}}</h2>
-    <h3 class="col-4">
+    <h3 class="col-8">Folio n°: {{mov_encabezado.folio}}</h3>
+    <h4 class="col-4">
     {% if mov_encabezado.estado == 'SOLICITADO' or mov_encabezado.estado == 'NO AUTORIZADO' %} 
     {{ mov_encabezado.num_items_solicitado }} items, ${{ mov_encabezado.monto_solicitado }}
     {% elif mov_encabezado.estado == 'AUTORIZADO' %} 
@@ -54,7 +58,7 @@
     {% elif mov_encabezado.estado == 'EJECUTADO' %} 
     {{ mov_encabezado.num_items_ejecutado }} items, ${{ mov_encabezado.monto_ejecutado }}
     {% endif %}
-    </h3>
+    </h4>
     </div>  
     {% if mov_encabezado.estado == "SOLICITADO" and not user_autorizando  %}
     <h4 class="text-warning" >En espera de autorización</h4>
@@ -78,7 +82,7 @@
                     <form method="POST">
                         {% csrf_token %}
                         {{encabezado_form}}
-                        <input class="btn btn-success" type="submit"
+                        <input class="btn btn-success" style="margin-top:20px;" type="submit"
                                value="{% if user_creando %}
                                         Crear
                                       {% elif user_solicitando %}
@@ -96,14 +100,23 @@
     <div class="col-md-7">
         <div class="card card-default" >
             <div class="card-header">
-                <h3>Agregue un producto</h3>
+                <div class="row">
+                    <h4 class="col-md-5 col">Agregue un producto</h4>
+                    <form action="" id="form-search" method="POST">
+                        {% csrf_token %}
+                        <input class="col-md-4 col-8" name="contains" id="search-text" type="text" placeholder="Buscar Producto...">
+                        <button class="col-md-2 col-4 btn btn-primary" 
+                        style="margin-left:20px;" id="search-prod"
+                        data-bs-toggle="modal" data-bs-target="#movprodModal">Buscar!</button>
+                    </form> 
+                </div>
             </div>
             <div class="card-body">
                 {% if producto_form %}
                     <form method="POST">
                         {% csrf_token %}
                         {{ producto_form}}
-                        <input class="btn btn-primary" type="submit" value="+">
+                        <input class="btn btn-primary" id="btn-add-item" type="submit" value="+">
                     </form>
                     {% if posibles_productos %}
                         <p>Existe más de un producto con ese nombre:</p>
@@ -166,9 +179,9 @@
                 <form class="form-inline"  method='POST' action="{% url 'edit_item' mov_encabezado.id %}">
                     {% csrf_token %}
                     <input type="hidden" name="id_item" value="{{mov_item.id}}">
-                    <input class="col-2" type="number" name="quantity" min="0"
+                    <input class="col-2" type="number" name="quantity" min="0" style="width:50px;"
                            value="{% if user_solicitando %}{{mov_item.cant_solicitada}}{% elif user_autorizando %}{{mov_item.cant_autorizada}}{% elif user_ejecutando %}{{mov_item.cant_ejecutada}}{% endif %}">
-                    <button class="col-2 btn btn-primary h-red mg-auto" id="btn-add-item"><i class="fas fa-edit"></i></button>
+                    <button class="col-2 btn btn-primary h-red mg-auto" style="margin-left:5px; width:40px;" id="btn-add-item "><i class="fas fa-edit"></i></button>
                 </form>
             </td>
             {% endif %}
