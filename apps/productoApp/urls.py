@@ -15,4 +15,6 @@ urlpatterns = [
     path('item/update', views.updateProduct, name="updateproducto"),  # AJAX
     path('get/filter', views.getFilteredProducts, name="productfilter"),  # AJAX
     path('graficos/stock_monto', views.GraficoStockMonto, name='graf_stock_monto'),
+    path('graficos/consumo_area/salidas', views.GraficoConsumo, name='graf_consumo_salidas'),
+    path('graficos/consumo_area/entradas', views.GraficoConsumoEntrada, name='graf_consumo_entradas'),
 ]

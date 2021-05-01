@@ -1,6 +1,6 @@
 from apps.movApp.models import Stock
 from apps.productoApp.models import Producto
-from apps.mantenedorApp.models import Familia, UnidadMedida
+from apps.mantenedorApp.models import Area, Familia, UnidadMedida
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from apps.loginApp.models import User
@@ -396,3 +396,66 @@ def GraficoStockMonto(request):
         'user': User.objects.get(id = request.session['id']),
     }
     return render(request, 'grafico.html', context)
+
+
+def GraficoConsumo(request):
+
+    if 'id' not in request.session or not request.session['is_active']:
+        return redirect('signin')
+
+    areas = Area.objects.filter(is_active=True)
+
+    data_series = []
+    data_consumo = []
+
+    for a in areas:
+        movs = a.movs_asociados.all().filter(tipo_mov__name="SALIDA")
+        print(movs)
+        total = 0
+        for m in movs:
+            total += m.monto_ejecutado
+        print(a.name)
+        print(total)
+        print(movs)
+        if total>0:
+            data_series.append(a.name)
+            data_consumo.append(total)
+
+    context = {
+        'data_series': data_series,
+        'data_consumo': data_consumo,
+        'user' : User.objects.get(id=request.session['id']),
+        'titulo' : 'Monto Total Salidas por Area',
+    }
+    return render(request, 'graficoConsumo.html', context)
+
+def GraficoConsumoEntrada(request):
+
+    if 'id' not in request.session or not request.session['is_active']:
+        return redirect('signin')
+
+    areas = Area.objects.filter(is_active=True)
+
+    data_series = []
+    data_consumo = []
+
+    for a in areas:
+        movs = a.movs_asociados.all().filter(tipo_mov__name="ENTRADA")
+        print(movs)
+        total = 0
+        for m in movs:
+            total += m.monto_ejecutado
+        print(a.name)
+        print(total)
+        print(movs)
+        if total>0:
+            data_series.append(a.name)
+            data_consumo.append(total)
+
+    context = {
+        'data_series': data_series,
+        'data_consumo': data_consumo,
+        'user' : User.objects.get(id=request.session['id']),
+        'titulo' : 'Monto Total Entradas por Area',
+    }
+    return render(request, 'graficoConsumo.html', context)

@@ -5,6 +5,7 @@ $(document).on("click", "[id^=btn-item-choose-]", function(){
     console.log($(`#modal-name-${id}`).html())
     $("#id_cod").val($(`#modal-cod-${id}`).html())
     $("#id_name").val($(`#modal-name-${id}`).html())
+    $("#id_precio_unit").val($(`#modal-precio-unit-${id}`).html())
 
     if ($("#id_cant_solicitada").val() == ""){
         $("#id_cant_solicitada").val('1')
@@ -43,6 +44,7 @@ $(document).ready( function(){
     $("#id_cod").css({'width':'90px','font-weight':'500','color':'blue'});
     $("#id_cant_solicitada").css({'width':'55px','font-weight':'500','color':'blue'});
     $("#id_name").css({'width':'250px','font-weight':'500','color':'blue'});
+    $("#id_precio_unit").css({'width':'70px','font-weight':'500','color':'blue'});
     $("ul.errorlist li").css('color','red');
 
 })
@@ -187,7 +189,7 @@ function getFilaHtml(producto){
     <td scope="col" id="modal-cod-${producto.id}">${producto['cod']}</td>
     <td scope="col" id="modal-name-${producto.id}">${producto['name']}</td>
     <td scope="col">${producto['cantidad']}</td>
-    <td scope="col">${Math.round(producto['precio_unit'])}</td>
+    <td scope="col" id="modal-precio-unit-${producto.id}">${Math.round(producto['precio_unit'])}</td>
     <td><button class="btn btn-success" id="btn-item-choose-${producto['id']}">Elegir</button></td>`;
 
     return txt
