@@ -180,22 +180,10 @@
                 <td scope="col">{% if mov_item.cant_ejecutada == None %} 0 {%else%} {{ mov_item.cant_ejecutada }} {%endif%}</td>
             {%endif%}
 
-            {% if mov_encabezado.abierto and mov_encabezado.tipo_mov.name == "SALIDA" %}
-                <td scope="col">{{ mov_item.producto.precio_unit }}</td>
+            {% if mov_encabezado.tipo_mov.name == "ENTRADA" %}
+                <td scope="col">{{ mov_item.precio_unit }}</td>
             {% else %}
-                <td scope="col">
-                {% if user_solicitando or user_autorizando or user_ejecutando %}
-                    <form class="form-inline"  method='POST' action="" id="form-edit-item-{{ mov_item.id }}">
-                        {% csrf_token %}
-                        <input type="hidden" name="id_item" value="{{mov_item.id}}">
-                        <input class="col-2" type="number" name="quantity" min="0" style="width:50px;"
-                            value="{{ mov_item.precio_unit }}">
-                        <button class="col-2 btn btn-primary h-red mg-auto" style="margin-left:5px; width:40px;" id="btn-edit-item-{{ mov_item.id }}"><i class="fas fa-edit"></i></button>
-                    </form>
-                {% else %}
-                    {{ mov_item.precio_unit }}
-                {% endif %}
-                </td>
+                <td scope="col">{{ mov_item.producto.precio_unit }}</td>
             {% endif %}
 
             {% if mov_encabezado.abierto %}

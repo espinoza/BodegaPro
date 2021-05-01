@@ -457,7 +457,7 @@ def cambiarEstado(request, id_mov_encabezado):
                 mov_item.save()
 
         if new_estado.name == "EJECUTADO":
-            modificarStock(mov)
+            modificarStock(mov_encabezado)
             return redirect("/productos/view")
 
         if new_estado.name in ["CANCELADO", "NO AUTORIZADO", "EJECUTADO"]:
@@ -516,12 +516,13 @@ def sacarPDFSinstock(request):
 
 
 def modificarStock(mov):
+    print('antes de ponderador')
     ponderador = mov.tipo_mov.folio.signo_stock
     print(ponderador)
     items = mov.mov_items.all()
     for item in items:
         producto_a_modificar = Producto.objects.get(id=item.producto.id)
-        stock_a_modificar = Stock.objects.get(id=producto_a_modificar.id)
+        stock_a_modificar = Stock.objects.get(producto=producto_a_modificar)
         # Sacamos precio
         if stock_a_modificar.cantidad != 0:
             precio_actual = stock_a_modificar.monto_total/stock_a_modificar.cantidad
